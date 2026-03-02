@@ -3,6 +3,8 @@
 
 // const AppSettingsContext = createContext();
 
+// const BASE_URL = import.meta.env.VITE_API_BASE_URL_Image_URl;
+
 // export const AppSettingsProvider = ({ children }) => {
 //   const [settings, setSettings] = useState({
 //     logo: "",
@@ -16,24 +18,23 @@
 //     const loadSettings = async () => {
 //       try {
 //         const res = await api.get("/auth/app-logo-settings");
-//         console.log("response", res.data.data);
-//         if (res.data?.status) {
+
+//         console.log("API RESPONSE:", res.data);
+
+//         if (res.data?.success && res.data?.data) {
+//           const data = res.data.data; // ✅ FIXED
+
+//           const fullLogo = data.app_logo ? `${BASE_URL}/${data.app_logo}` : "";
+
+//           const fullFavicon = data.app_favicon
+//             ? `${BASE_URL}/${data.app_favicon}`
+//             : "";
+
 //           setSettings({
-//             logo: res.data.data.logo,
-//             app_name: res.data.data.app_name,
-//             favicon: res.data.data.favicon,
+//             logo: fullLogo,
+//             app_name: data.app_name || "",
+//             favicon: fullFavicon,
 //           });
-
-//           // 🔥 update favicon dynamically
-//           if (res.data.data.favicon) {
-//             let link =
-//               document.querySelector("link[rel~='icon']") ||
-//               document.createElement("link");
-
-//             link.rel = "icon";
-//             link.href = res.data.data.favicon;
-//             document.head.appendChild(link);
-//           }
 //         }
 //       } catch (err) {
 //         console.error("Failed to load app settings", err);
@@ -54,7 +55,7 @@
 
 // export const useAppSettings = () => useContext(AppSettingsContext);
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useMemo } from "react";
 import api from "../api/axios";
 
 const AppSettingsContext = createContext();
@@ -70,80 +71,45 @@ export const AppSettingsProvider = ({ children }) => {
 
   const [loading, setLoading] = useState(true);
 
-  // useEffect(() => {
-  //   const loadSettings = async () => {
-  //     try {
-  //       const res = await api.get("/auth/app-logo-settings");
-
-  //       if (res.data?.status && res.data?.data) {
-  //         const data = res.data.data;
-
-  //         const fullLogo = data.app_logo ? `${BASE_URL}/${data.app_logo}` : "";
-
-  //         const fullFavicon = data.app_favicon
-  //           ? `${BASE_URL}/${data.app_favicon}`
-  //           : "";
-
-  //         setSettings({
-  //           logo: fullLogo,
-  //           app_name: data.app_name || "",
-  //           favicon: fullFavicon,
-  //         });
-
-  //         if (fullFavicon) {
-  //           let link =
-  //             document.querySelector("link[rel~='icon']") ||
-  //             document.createElement("link");
-
-  //           link.rel = "icon";
-  //           link.href = fullFavicon;
-  //           document.head.appendChild(link);
-  //         }
-  //       }
-  //     } catch (err) {
-  //       console.error("Failed to load app settings", err);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   loadSettings();
-  // }, []);
-
   useEffect(() => {
+    let isMounted = true;
+
     const loadSettings = async () => {
       try {
         const res = await api.get("/auth/app-logo-settings");
 
-        console.log("API RESPONSE:", res.data);
+        if (!isMounted) return;
 
         if (res.data?.success && res.data?.data) {
-          const data = res.data.data; // ✅ FIXED
-
-          const fullLogo = data.app_logo ? `${BASE_URL}/${data.app_logo}` : "";
-
-          const fullFavicon = data.app_favicon
-            ? `${BASE_URL}/${data.app_favicon}`
-            : "";
+          const data = res.data.data;
 
           setSettings({
-            logo: fullLogo,
+            logo: data.app_logo ? `${BASE_URL}/${data.app_logo}` : "",
             app_name: data.app_name || "",
-            favicon: fullFavicon,
+            favicon: data.app_favicon ? `${BASE_URL}/${data.app_favicon}` : "",
           });
         }
       } catch (err) {
         console.error("Failed to load app settings", err);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
     loadSettings();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
+  // 🔥 IMPORTANT: Memoize value
+  const value = useMemo(() => {
+    return { settings, loading };
+  }, [settings, loading]);
+
   return (
-    <AppSettingsContext.Provider value={{ settings, loading }}>
+    <AppSettingsContext.Provider value={value}>
       {children}
     </AppSettingsContext.Provider>
   );
