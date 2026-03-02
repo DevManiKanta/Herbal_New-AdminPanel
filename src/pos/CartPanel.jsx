@@ -5,6 +5,12 @@ import api from "../api/axios";
 
 export default function CartPanel({ cart = [], setCart }) {
   /* ================= CUSTOMER ================= */
+
+
+  const [showOrderHistory, setShowOrderHistory] = useState(false);
+const [orderHistory, setOrderHistory] = useState([]);
+
+
   const [customer, setCustomer] = useState({
     name: "",
     phone: "",
@@ -27,12 +33,22 @@ export default function CartPanel({ cart = [], setCart }) {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [showNewAddress, setShowNewAddress] = useState(false);
 
+  // const [newAddress, setNewAddress] = useState({
+  //   address_line: "",
+  //   city: "",
+  //   state: "",
+  //   pincode: "",
+  // });
+
   const [newAddress, setNewAddress] = useState({
-    address_line: "",
-    city: "",
-    state: "",
-    pincode: "",
-  });
+  door_no: "",
+  street: "",
+  area: "",
+  address_line: "",
+  city: "",
+  state: "",
+  pincode: "",
+});
 
   const [discount, setDiscount] = useState(0);
   const [paymentMode, setPaymentMode] = useState("pay");
@@ -77,31 +93,54 @@ export default function CartPanel({ cart = [], setCart }) {
   };
 
   /* ================= SUBMIT ================= */
+
+
   const handleSubmit = async () => {
-    if (!customer.name || !isValidPhone(customer.phone)) {
-      alert("Enter valid customer details");
-      return;
-    }
+  if (!customer.name || !isValidPhone(customer.phone)) {
+    alert("Enter valid customer details");
+    return;
+  }
 
-    if (cart.length === 0) {
-      alert("Cart is empty");
-      return;
-    }
+  if (cart.length === 0) {
+    alert("Cart is empty");
+    return;
+  }
 
-    const selectedAddressObj = addresses.find(
-      (a) => String(a.id) === String(selectedAddress),
-    );
+  const selectedAddressObj = addresses.find(
+    (a) => String(a.id) === String(selectedAddress)
+  );
 
-    let addressData = null;
+  let addressData = null;
 
-    if (selectedAddressObj) {
-      addressData = selectedAddressObj;
-    } else if (showNewAddress) {
-      addressData = newAddress;
-    }
+  if (selectedAddressObj) {
+    addressData = selectedAddressObj;
+  } else if (showNewAddress) {
+    addressData = newAddress;
+  }
 
+  // ✅ FIXED VALIDATION (works for both old + new address)
+  if (!addressData) {
+    alert("Please provide complete address");
+    return;
+  }
+
+  if (showNewAddress) {
+    // New Address must have door, street, area
     if (
-      !addressData ||
+      !addressData.door_no ||
+      !addressData.street ||
+      !addressData.area ||
+      !addressData.address_line ||
+      !addressData.city ||
+      !addressData.state ||
+      !addressData.pincode
+    ) {
+      alert("Please provide complete address");
+      return;
+    }
+  } else {
+    // Existing address (old structure safe)
+    if (
       !(addressData.address_line || addressData.address) ||
       !addressData.city ||
       !addressData.state ||
@@ -110,98 +149,70 @@ export default function CartPanel({ cart = [], setCart }) {
       alert("Please provide complete address");
       return;
     }
+  }
 
-    const payload = {
-      customer_id: selectedCustomer?.id || null,
-      address_id: selectedAddress || null,
-      new_address: showNewAddress ? newAddress : null,
+  const payload = {
+    customer_id: selectedCustomer?.id || null,
+    address_id: selectedAddress || null,
+    new_address: showNewAddress ? newAddress : null,
 
-      payment_method: paymentMode,
-      paid_amount: Number(total.toFixed(2)),
+    payment_method: paymentMode,
+    paid_amount: Number(total.toFixed(2)),
 
-      // ADD THESE
-      subtotal: subtotal,
-      discount_total: discount,
-      tax_total: gst,
-      grand_total: total,
+    subtotal: subtotal,
+    discount_total: discount,
+    tax_total: gst,
+    grand_total: total,
 
-      customer_name: customer.name,
-      customer_phone: customer.phone,
+    customer_name: customer.name,
+    customer_phone: customer.phone,
 
-      address_snapshot: {
-        address: addressData.address_line || addressData.address,
-        city: addressData.city,
-        state: addressData.state,
-        country: addressData.country || "India",
-        pincode: addressData.pincode,
-      },
+    // ✅ SAFE SNAPSHOT (no crash if old address)
+    address_snapshot: {
+      door_no: addressData.door_no || null,
+      street: addressData.street || null,
+      area: addressData.area || null,
+      address: addressData.address_line || addressData.address,
+      city: addressData.city,
+      state: addressData.state,
+      country: addressData.country || "India",
+      pincode: addressData.pincode,
+    },
 
-      items: cart.map((item) => ({
-        product_id: item.product_id,
-        variant_id: item.variation_id,
-        qty: item.qty,
-      })),
-    };
-
-    // try {
-    //   setLoading(true);
-
-    //   // STEP 1 → SEND OTP
-    //   const otpRes = await api.post("/admin-dashboard/send-order-otp", payload);
-
-    //   if (otpRes.data.success) {
-    //     setPendingPayload(payload);
-    //     setPendingId(otpRes.data.pending_id); // 🔥 VERY IMPORTANT
-    //     setShowOtpModal(true);
-    //     alert("OTP sent to WhatsApp");
-    //   } else {
-    //     alert(otpRes.data.message);
-    //   }
-    // } catch (err) {
-    //   console.log("ERROR FULL:", err);
-    //   console.log("STATUS:", err.response?.status);
-    //   console.log("DATA:", err.response?.data);
-
-    //   alert(err.response?.data?.message || "Failed to send OTP");
-    // } finally {
-    //   setLoading(false);
-    // }
-
-    try {
-      setLoading(true);
-
-      console.log("SENDING OTP...");
-
-      const otpRes = await api.post("/admin-dashboard/send-order-otp", payload);
-
-      console.log("FULL RESPONSE:", otpRes);
-
-      if (otpRes?.data?.success === true) {
-        console.log("OTP SUCCESS BLOCK");
-
-        if (typeof setPendingPayload === "function") {
-          setPendingPayload(payload);
-        }
-
-        if (typeof setPendingId === "function") {
-          setPendingId(otpRes.data.pending_id);
-        }
-
-        if (typeof setShowOtpModal === "function") {
-          setShowOtpModal(true);
-        }
-
-        alert("OTP sent to WhatsApp");
-      } else {
-        alert(otpRes?.data?.message || "Unexpected response");
-      }
-    } catch (err) {
-      console.log("🔥 ACTUAL ERROR:", err);
-      alert("Failed to send OTP");
-    } finally {
-      setLoading(false);
-    }
+    items: cart.map((item) => ({
+      product_id: item.product_id,
+      variant_id: item.variation_id,
+      qty: item.qty,
+    })),
   };
+
+  try {
+    setLoading(true);
+
+    console.log("SENDING OTP...");
+
+    const otpRes = await api.post(
+      "/admin-dashboard/send-order-otp",
+      payload
+    );
+
+    console.log("FULL RESPONSE:", otpRes);
+
+    if (otpRes?.data?.success === true) {
+      setPendingPayload(payload);
+      setPendingId(otpRes.data.pending_id);
+      setShowOtpModal(true);
+      alert("OTP sent to WhatsApp");
+    } else {
+      alert(otpRes?.data?.message || "Unexpected response");
+    }
+  } catch (err) {
+    console.log("🔥 ACTUAL ERROR:", err);
+    alert("Failed to send OTP");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleVerifyOtp = async () => {
     if (!otp) {
@@ -351,6 +362,8 @@ export default function CartPanel({ cart = [], setCart }) {
                     name: user.name,
                   }));
 
+
+                   setOrderHistory(user.orders || []);
                   // ✅ USE ADDRESSES FROM SAME RESPONSE
                   if (user.addresses && user.addresses.length > 0) {
                     setAddresses(user.addresses);
@@ -387,6 +400,15 @@ export default function CartPanel({ cart = [], setCart }) {
           }`}
         />
 
+        {orderHistory.length > 0 && (
+  <button
+    onClick={() => setShowOrderHistory(true)}
+    className="text-sm text-blue-600 underline"
+  >
+    View Purchase History ({orderHistory.length})
+  </button>
+)}
+
         {/* ADDRESS UI */}
         {selectedCustomer && (
           <div className="mt-3 space-y-3">
@@ -404,8 +426,7 @@ export default function CartPanel({ cart = [], setCart }) {
                 >
                   {addresses.map((addr) => (
                     <option key={addr.id} value={addr.id}>
-                      {addr.address_line}, {addr.city}, {addr.state} -{" "}
-                      {addr.pincode}
+                    {addr.door_no}, {addr.street}, {addr.area}, {addr.address_line}, {addr.city}, {addr.state} - {addr.pincode}
                     </option>
                   ))}
                 </select>
@@ -435,6 +456,43 @@ export default function CartPanel({ cart = [], setCart }) {
             {/* NEW ADDRESS FORM */}
             {showNewAddress && (
               <div className="p-3 border rounded-lg bg-gray-50 space-y-3">
+               
+               <input
+                placeholder="Door No"
+                value={newAddress.door_no}
+                onChange={(e) =>
+                  setNewAddress({
+                    ...newAddress,
+                    door_no: e.target.value,
+                  })
+                }
+                className="w-full border rounded px-3 py-2 text-sm"
+              />
+
+              <input
+                placeholder="Street"
+                value={newAddress.street}
+                onChange={(e) =>
+                  setNewAddress({
+                    ...newAddress,
+                    street: e.target.value,
+                  })
+                }
+                className="w-full border rounded px-3 py-2 text-sm"
+              />
+
+              <input
+                placeholder="Area"
+                value={newAddress.area}
+                onChange={(e) =>
+                  setNewAddress({
+                    ...newAddress,
+                    area: e.target.value,
+                  })
+                }
+                className="w-full border rounded px-3 py-2 text-sm"
+              /> 
+                            
                 <input
                   placeholder="Address Line"
                   value={newAddress.address_line}
@@ -507,10 +565,13 @@ export default function CartPanel({ cart = [], setCart }) {
                   <button
                     onClick={async () => {
                       if (
-                        !newAddress.address_line ||
-                        !newAddress.city ||
-                        !newAddress.state ||
-                        newAddress.pincode.length !== 6
+                       !newAddress.door_no ||
+                      !newAddress.street ||
+                      !newAddress.area ||
+                      !newAddress.address_line ||
+                      !newAddress.city ||
+                      !newAddress.state ||
+                      newAddress.pincode.length !== 6
                       ) {
                         alert("Please fill all address fields properly");
                         return;
@@ -519,12 +580,15 @@ export default function CartPanel({ cart = [], setCart }) {
                       try {
                         const payload = {
                           user_id: selectedCustomer?.id,
-                          name: customer.name, // ✅ THIS IS REQUIRED
-                          phone: customer.phone,
-                          address: newAddress.address_line,
-                          city: newAddress.city,
-                          state: newAddress.state,
-                          pincode: newAddress.pincode,
+                        name: customer.name,
+                        phone: customer.phone,
+                        door_no: newAddress.door_no,
+                        street: newAddress.street,
+                        area: newAddress.area,
+                        address: newAddress.address_line,
+                        city: newAddress.city,
+                        state: newAddress.state,
+                        pincode: newAddress.pincode,
                         };
 
                         const res = await api.post(
@@ -545,6 +609,9 @@ export default function CartPanel({ cart = [], setCart }) {
 
                           // Clear form
                           setNewAddress({
+                            door_no: "",
+                            street: "",
+                            area: "",
                             address_line: "",
                             city: "",
                             state: "",
@@ -687,6 +754,79 @@ export default function CartPanel({ cart = [], setCart }) {
           Payment Done (Test)
         </button>
       )}
+
+
+      {showOrderHistory && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="bg-white w-[800px] max-h-[90vh] overflow-y-auto rounded-2xl p-6">
+
+      {/* HEADER */}
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-xl font-semibold">Purchase History</h3>
+        <button
+          onClick={() => setShowOrderHistory(false)}
+          className="text-gray-500 text-lg"
+        >
+          ✕
+        </button>
+      </div>
+
+      {orderHistory.map((order) => (
+        <div
+          key={order.id}
+          className="border rounded-xl p-4 mb-4 bg-gray-50"
+        >
+          {/* ORDER HEADER */}
+          <div className="flex justify-between mb-3">
+            <div>
+              <p className="font-semibold">
+                Invoice: {order.invoice_number}
+              </p>
+              <p className="text-xs text-gray-500">
+                Date: {order.date}
+              </p>
+            </div>
+
+            <div className="text-right">
+              <p className="font-semibold text-green-700">
+                ₹ {order.grand_total}
+              </p>
+            </div>
+          </div>
+
+          {/* PRODUCTS */}
+          <div className="space-y-2">
+            {order.items.map((item) => (
+              <div
+                key={item.id}
+                className="flex justify-between border-b pb-2 text-sm"
+              >
+                <div>
+                  <p className="font-medium">
+                    {item.product_name}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Qty: {item.qty}
+                  </p>
+                </div>
+
+                <div className="font-semibold">
+                  ₹ {item.total}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      {orderHistory.length === 0 && (
+        <p className="text-center text-gray-500">
+          No purchase history found
+        </p>
+      )}
+    </div>
+  </div>
+)}
     </div>
   );
 }
@@ -699,3 +839,8 @@ function Row({ label, value }) {
     </div>
   );
 }
+
+
+
+
+

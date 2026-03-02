@@ -181,7 +181,7 @@ export default function StaffAttendanceCalendar() {
         name: staffForm.name,
         phone: staffForm.phone,
         email: staffForm.email,
-        password: "default@123",
+        password: "123123",
         role: staffForm.role === "Manager" ? "employeer" : "employee",
         salary: staffForm.salary,
         joining_date: staffForm.joining_date,

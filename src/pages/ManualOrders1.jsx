@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
-export default function ManualOrders() {
+export default function ManualOrders1() {
   const navigate = useNavigate();
 
   const [orders, setOrders] = useState([]);
@@ -36,7 +36,7 @@ export default function ManualOrders() {
       // );
 
           const res = await api.get(
-        `/admin-dashboard/calling/orders?page=${page}&search=${search}`,
+        `/admin-dashboard/calling/orders-employee?page=${page}&search=${search}`,
       );
 
       if (res.data.success) {
