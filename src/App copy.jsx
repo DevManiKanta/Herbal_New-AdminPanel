@@ -101,7 +101,7 @@ export default function App() {
   const user = JSON.parse(localStorage.getItem("user"));
 const role = user?.role;
 
-console.log("User role:", role);
+
   return (
     <BrowserRouter>
       <LogoSettingsProvider>
@@ -153,6 +153,8 @@ console.log("User role:", role);
               }
             >
               {/* DEFAULT AFTER LOGIN */}
+
+              
 
               {isHerbal && (
                 <>
