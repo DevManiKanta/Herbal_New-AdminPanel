@@ -300,6 +300,7 @@ export default function Sidebar({ open, setOpen, logout }) {
                 <>
                   <Item to="/dashboard" icon={Home} label="Dashboard" />
                   <Item to="/products" icon={Box} label="Products" />
+                       <Item to="/bulk-variant-images" icon={Box} label="Bulk Variant Images" />
                   <Item
                     to="/add-categories"
                     icon={Tag}
@@ -335,6 +336,7 @@ export default function Sidebar({ open, setOpen, logout }) {
                 <>
                   <Item to="/dashboard" icon={Home} label="Dashboard" />
                   <Item to="/products" icon={Box} label="Products" />
+                       <Item to="/bulk-variant-images" icon={Box} label="Bulk Variant Images" />
                   <Item to="/categories" icon={Tag} label="Category" />
                   <Item to="/orders" icon={Package} label="Orders" />
                   <Item to="/users" icon={Users} label="Users" />

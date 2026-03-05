@@ -32,6 +32,7 @@ const [orderHistory, setOrderHistory] = useState([]);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [showNewAddress, setShowNewAddress] = useState(false);
+  const [isOnCallCustomer, setIsOnCallCustomer] = useState(false);
 
   // const [newAddress, setNewAddress] = useState({
   //   address_line: "",
@@ -59,6 +60,42 @@ const [orderHistory, setOrderHistory] = useState([]);
 
   /* ================= HELPERS ================= */
   const isValidPhone = (phone) => /^[6-9]\d{9}$/.test(phone);
+  const cleanAddressParts = (parts) => {
+    const seen = new Set();
+    return parts
+      .map((part) => String(part ?? "").trim())
+      .filter((part) => {
+        if (!part) return false;
+        const key = part.toLowerCase();
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+  };
+
+  const formatAddressText = (addr = {}) => {
+    const line1 = cleanAddressParts([
+      addr.door_no,
+      addr.street,
+      addr.area,
+      addr.address_line || addr.address,
+    ]).join(", ");
+    const line2 = cleanAddressParts([addr.city, addr.state, addr.pincode]).join(
+      ", ",
+    );
+    const optionLabel = cleanAddressParts([
+      addr.door_no,
+      addr.street,
+      addr.city,
+      addr.pincode ? `PIN ${addr.pincode}` : "",
+    ]).join(", ");
+
+    return {
+      line1: line1 || "Saved address",
+      line2,
+      optionLabel: optionLabel || line1 || line2 || "Saved address",
+    };
+  };
 
   /* ================= CALCULATIONS ================= */
   const subtotal = useMemo(
@@ -106,55 +143,58 @@ const [orderHistory, setOrderHistory] = useState([]);
     return;
   }
 
-  const selectedAddressObj = addresses.find(
-    (a) => String(a.id) === String(selectedAddress)
-  );
+  const selectedAddressObj = isOnCallCustomer
+    ? addresses.find((a) => String(a.id) === String(selectedAddress))
+    : null;
 
   let addressData = null;
 
-  if (selectedAddressObj) {
-    addressData = selectedAddressObj;
-  } else if (showNewAddress) {
-    addressData = newAddress;
-  }
+  if (isOnCallCustomer) {
+    if (selectedAddressObj) {
+      addressData = selectedAddressObj;
+    } else if (showNewAddress) {
+      addressData = newAddress;
+    }
 
-  // ✅ FIXED VALIDATION (works for both old + new address)
-  if (!addressData) {
-    alert("Please provide complete address");
-    return;
-  }
-
-  if (showNewAddress) {
-    // New Address must have door, street, area
-    if (
-      !addressData.door_no ||
-      !addressData.street ||
-      !addressData.area ||
-      !addressData.address_line ||
-      !addressData.city ||
-      !addressData.state ||
-      !addressData.pincode
-    ) {
+    // ✅ FIXED VALIDATION (works for both old + new address)
+    if (!addressData) {
       alert("Please provide complete address");
       return;
     }
-  } else {
-    // Existing address (old structure safe)
-    if (
-      !(addressData.address_line || addressData.address) ||
-      !addressData.city ||
-      !addressData.state ||
-      !addressData.pincode
-    ) {
-      alert("Please provide complete address");
-      return;
+
+    if (showNewAddress) {
+      // New Address must have door, street, area
+      if (
+        !addressData.door_no ||
+        !addressData.street ||
+        !addressData.area ||
+        !addressData.address_line ||
+        !addressData.city ||
+        !addressData.state ||
+        !addressData.pincode
+      ) {
+        alert("Please provide complete address");
+        return;
+      }
+    } else {
+      // Existing address (old structure safe)
+      if (
+        !(addressData.address_line || addressData.address) ||
+        !addressData.city ||
+        !addressData.state ||
+        !addressData.pincode
+      ) {
+        alert("Please provide complete address");
+        return;
+      }
     }
   }
 
   const payload = {
     customer_id: selectedCustomer?.id || null,
-    address_id: selectedAddress || null,
-    new_address: showNewAddress ? newAddress : null,
+    customer_type: isOnCallCustomer ? "on call customer" : "normal customer",
+    address_id: isOnCallCustomer ? selectedAddress || null : null,
+    new_address: isOnCallCustomer && showNewAddress ? newAddress : null,
 
     payment_method: paymentMode,
     paid_amount: Number(total.toFixed(2)),
@@ -168,16 +208,18 @@ const [orderHistory, setOrderHistory] = useState([]);
     customer_phone: customer.phone,
 
     // ✅ SAFE SNAPSHOT (no crash if old address)
-    address_snapshot: {
-      door_no: addressData.door_no || null,
-      street: addressData.street || null,
-      area: addressData.area || null,
-      address: addressData.address_line || addressData.address,
-      city: addressData.city,
-      state: addressData.state,
-      country: addressData.country || "India",
-      pincode: addressData.pincode,
-    },
+    address_snapshot: isOnCallCustomer
+      ? {
+          door_no: addressData?.door_no || null,
+          street: addressData?.street || null,
+          area: addressData?.area || null,
+          address: addressData?.address_line || addressData?.address,
+          city: addressData?.city || null,
+          state: addressData?.state || null,
+          country: addressData?.country || "India",
+          pincode: addressData?.pincode || null,
+        }
+      : null,
 
     items: cart.map((item) => ({
       product_id: item.product_id,
@@ -189,26 +231,51 @@ const [orderHistory, setOrderHistory] = useState([]);
   try {
     setLoading(true);
 
-    console.log("SENDING OTP...");
+    // ✅ NORMAL CUSTOMER (Walk-in) - Direct Payment
+    if (!isOnCallCustomer) {
+      console.log("NORMAL CUSTOMER - Creating payment link directly...");
 
-    const otpRes = await api.post(
-      "/admin-dashboard/send-order-otp",
-      payload
-    );
+      const paymentRes = await api.post(
+        "/admin-dashboard/create-payment-link",
+        {
+          amount: total,
+          name: customer.name,
+          phone: customer.phone,
+        },
+      );
 
-    console.log("FULL RESPONSE:", otpRes);
+      if (paymentRes.data.success) {
+        alert("Payment link sent to customer phone");
+        setPendingPayload(payload);
+        setShowPaymentDone(true);
+        console.log("Payment Link:", paymentRes.data.payment_link);
+      } else {
+        alert(paymentRes.data.message || "Failed to create payment link");
+      }
+    } 
+    // ✅ ON-CALL CUSTOMER - OTP Flow
+    else {
+      console.log("SENDING OTP...");
 
-    if (otpRes?.data?.success === true) {
-      setPendingPayload(payload);
-      setPendingId(otpRes.data.pending_id);
-      setShowOtpModal(true);
-      alert("OTP sent to WhatsApp");
-    } else {
-      alert(otpRes?.data?.message || "Unexpected response");
+      const otpRes = await api.post(
+        "/admin-dashboard/send-order-otp",
+        payload
+      );
+
+      console.log("FULL RESPONSE:", otpRes);
+
+      if (otpRes?.data?.success === true) {
+        setPendingPayload(payload);
+        setPendingId(otpRes.data.pending_id);
+        setShowOtpModal(true);
+        alert("OTP sent to WhatsApp");
+      } else {
+        alert(otpRes?.data?.message || "Unexpected response");
+      }
     }
   } catch (err) {
     console.log("🔥 ACTUAL ERROR:", err);
-    alert("Failed to send OTP");
+    alert("Failed to process order");
   } finally {
     setLoading(false);
   }
@@ -400,6 +467,26 @@ const [orderHistory, setOrderHistory] = useState([]);
           }`}
         />
 
+        <div className="flex items-center justify-between border rounded-lg px-3 py-2">
+          <span className="text-xs font-semibold text-gray-600">Customer Type</span>
+          <button
+            type="button"
+            onClick={() => {
+              setIsOnCallCustomer((prev) => {
+                const next = !prev;
+                if (!next) setShowNewAddress(false);
+                return next;
+              });
+            }}
+            className={`text-xs px-3 py-1 rounded-full font-semibold ${
+              isOnCallCustomer
+                ? "bg-green-100 text-green-700"
+                : "bg-gray-100 text-gray-700"
+            }`}
+          >
+            {isOnCallCustomer ? "On Call Customer" : "Normal Customer"}
+          </button>
+        </div>
         {orderHistory.length > 0 && (
   <button
     onClick={() => setShowOrderHistory(true)}
@@ -407,10 +494,10 @@ const [orderHistory, setOrderHistory] = useState([]);
   >
     View Purchase History ({orderHistory.length})
   </button>
-)}
+        )}
 
         {/* ADDRESS UI */}
-        {selectedCustomer && (
+        {selectedCustomer && isOnCallCustomer && (
           <div className="mt-3 space-y-3">
             {/* EXISTING ADDRESSES */}
             {addresses.length > 0 && !showNewAddress && (
@@ -422,14 +509,30 @@ const [orderHistory, setOrderHistory] = useState([]);
                 <select
                   value={selectedAddress || ""}
                   onChange={(e) => setSelectedAddress(e.target.value)}
-                  className="w-full border rounded-lg px-3 py-2 text-sm bg-white"
+                  className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 shadow-sm focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-100"
                 >
                   {addresses.map((addr) => (
                     <option key={addr.id} value={addr.id}>
-                    {addr.door_no}, {addr.street}, {addr.area}, {addr.address_line}, {addr.city}, {addr.state} - {addr.pincode}
+                      {formatAddressText(addr).optionLabel}
                     </option>
                   ))}
                 </select>
+
+                {selectedAddress && (() => {
+                  const selectedAddr = addresses.find(
+                    (a) => String(a.id) === String(selectedAddress),
+                  );
+                  const formatted = formatAddressText(selectedAddr || {});
+
+                  return (
+                    <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2">
+                      <p className="text-sm font-medium text-gray-800">{formatted.line1}</p>
+                      {formatted.line2 && (
+                        <p className="mt-1 text-xs text-gray-500">{formatted.line2}</p>
+                      )}
+                    </div>
+                  );
+                })()}
 
                 <div className="flex gap-4 text-xs">
                   <button
@@ -839,6 +942,7 @@ function Row({ label, value }) {
     </div>
   );
 }
+
 
 
 

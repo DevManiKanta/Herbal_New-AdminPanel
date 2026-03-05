@@ -2,9 +2,11 @@ import SettingsSidebar from "./components/SettingsSidebar";
 
 export default function SettingsLayout({ children }) {
   return (
-    <div className="flex gap-8">
-      <SettingsSidebar />
-      <div className="flex-1">{children}</div>
+    <div className="min-h-screen bg-white">
+      <div className="flex">
+        <SettingsSidebar />
+        <div className="flex-1 p-8 bg-white">{children}</div>
+      </div>
     </div>
   );
 }

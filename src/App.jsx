@@ -40,6 +40,11 @@ import VariationSettings from "./pages/settings/components/VariationSettings";
 import WhatsAppIntegrationSettings from "./pages/settings/components/WhatsAppIntegrationSettings";
 import CouponSettings from "./pages/settings/components/CouponSettings";
 import BannerSettings from "./pages/settings/components/BannerSettings";
+import ContactSettings from "./pages/settings/components/ContactSettings";
+import CustomerCareSettings from "./pages/settings/components/CustomerCareSettings";
+import ShippingSettings from "./pages/settings/components/ShippingSettings";
+import EditProductSections from "./pages/settings/components/EditProductSections";
+import ProductSectionAssign from "./pages/settings/components/ProductSectionAssign";
 
 /* PROVIDERS */
 import { LogoSettingsProvider } from "./context/LogoSettingsContext";
@@ -49,6 +54,9 @@ import { ProfileProvider } from "./context/ProfileContext";
 import BrandProtectedRoute from "./auth/BrandProtectedRoute";
 import ManualOrders1 from "./pages/ManualOrders1";
 import MyAttendance from "./pages/MyAttendance";
+
+import BulkVariantImages from "./pages/BulkVariantImages";
+
 
 export default function App() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -109,6 +117,7 @@ export default function App() {
                     <>
                       <Route path="/dashboard" element={<Dashboard />} />
                       <Route path="/products" element={<Products />} />
+                      <Route path="/bulk-variant-images" element={<BulkVariantImages />} />
                       <Route path="/add-categories" element={<AddCategory />} />
                       <Route path="/pos" element={<POS />} />
                       <Route
@@ -158,6 +167,46 @@ export default function App() {
                           path="banner-settings"
                           element={<BannerSettings />}
                         />
+                        <Route
+                          path="contact-page"
+                          element={<ContactSettings />}
+                        />
+                        <Route
+                          path="customer-care-settings"
+                          element={<CustomerCareSettings />}
+                        />
+                        <Route
+                          path="shipping-settings"
+                          element={<ShippingSettings />}
+                        />
+                        <Route
+                          path="product-sections"
+                          element={<EditProductSections />}
+                        />
+                        <Route
+                          path="footer-sections"
+                          element={<ProductSectionAssign />}
+                        />
+                        <Route
+                          path="footer-sections/reorder"
+                          element={<ProductSectionAssign />}
+                        />
+                        <Route
+                          path="pages"
+                          element={<ProductSectionAssign />}
+                        />
+                        <Route
+                          path="blog-categories"
+                          element={<ComingSoon />}
+                        />
+                        <Route
+                          path="blogs"
+                          element={<ComingSoon />}
+                        />
+                        <Route
+                          path="landing-banner-settings"
+                          element={<BannerSettings />}
+                        />
                       </Route>
                     </>
                   )}
@@ -167,6 +216,7 @@ export default function App() {
                     <>
                       <Route path="/dashboard" element={<Dashboard />} />
                       <Route path="/products" element={<Products />} />
+                       <Route path="/bulk-variant-images" element={<BulkVariantImages />} />
                       <Route path="/categories" element={<Category />} />
                       <Route
                         path="/staff-attendance"
@@ -219,6 +269,46 @@ export default function App() {
                     />
                     <Route
                       path="banner-settings"
+                      element={<BannerSettings />}
+                    />
+                    <Route
+                      path="contact-page"
+                      element={<ContactSettings />}
+                    />
+                    <Route
+                      path="customer-care-settings"
+                      element={<CustomerCareSettings />}
+                    />
+                    <Route
+                      path="shipping-settings"
+                      element={<ShippingSettings />}
+                    />
+                    <Route
+                      path="product-sections"
+                      element={<EditProductSections />}
+                    />
+                    <Route
+                      path="footer-sections"
+                      element={<ProductSectionAssign />}
+                    />
+                    <Route
+                      path="footer-sections/reorder"
+                      element={<ProductSectionAssign />}
+                    />
+                    <Route
+                      path="pages"
+                      element={<ProductSectionAssign />}
+                    />
+                    <Route
+                      path="blog-categories"
+                      element={<ComingSoon />}
+                    />
+                    <Route
+                      path="blogs"
+                      element={<ComingSoon />}
+                    />
+                    <Route
+                      path="landing-banner-settings"
                       element={<BannerSettings />}
                     />
                   </Route>
