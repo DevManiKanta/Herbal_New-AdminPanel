@@ -16,6 +16,13 @@ export default function POS() {
   const [openModal, setOpenModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
+  /* ================= PAGINATION ================= */
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
+  const totalPages = Math.ceil((products?.length || 0) / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedProducts = (products || []).slice(startIndex, startIndex + itemsPerPage);
+
   /* ================= LOAD CATEGORIES ================= */
   useEffect(() => {
     api
@@ -26,6 +33,7 @@ export default function POS() {
 
   /* ================= LOAD PRODUCTS ================= */
   useEffect(() => {
+    setCurrentPage(1); // Reset to first page when category changes
     api
       .get("/admin-dashboard/pos-products", {
         params: { category }, // removed brand
@@ -134,8 +142,8 @@ export default function POS() {
         />
 
         {/* PRODUCTS GRID */}
-        <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-4 overflow-y-auto">
-          {products.map((p) => (
+        <div className="flex-1 grid grid-cols-6 gap-1 overflow-y-auto">
+          {paginatedProducts.map((p) => (
             <ProductCard
               key={p.id}
               product={p}
@@ -143,6 +151,43 @@ export default function POS() {
             />
           ))}
         </div>
+
+        {/* PAGINATION */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 pb-2">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(currentPage - 1)}
+              className="px-3 py-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200"
+            >
+              ◀ Prev
+            </button>
+
+            <div className="flex gap-1">
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`px-3 py-2 rounded-lg border transition ${
+                    currentPage === i + 1
+                      ? "bg-black text-white border-black"
+                      : "bg-white hover:bg-gray-100"
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(currentPage + 1)}
+              className="px-3 py-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200"
+            >
+              Next ▶
+            </button>
+          </div>
+        )}
       </div>
 
       {/* CART PANEL */}

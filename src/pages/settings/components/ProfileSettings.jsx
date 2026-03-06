@@ -344,7 +344,7 @@ export default function ProfileSettings() {
         </div>
 
         {/* BRAND NAME TOGGLE */}
-        <div className="flex items-center justify-between border rounded-lg p-4">
+        {/* <div className="flex items-center justify-between border rounded-lg p-4">
           <div>
             <p className="text-sm font-medium">Brand</p>
           </div>
@@ -359,7 +359,7 @@ export default function ProfileSettings() {
           >
             {showBrandName ? "ON" : "OFF"}
           </button>
-        </div>
+        </div> */}
 
         <hr />
 

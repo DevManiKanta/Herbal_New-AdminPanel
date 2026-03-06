@@ -224,10 +224,14 @@ export default function Sidebar({ open, setOpen, logout }) {
     setLogo(logoSettings.app_logo_url || FALLBACK_LOGO);
   }, [logoSettings]);
 
-  const isActive = (path) =>
-    location.pathname.startsWith(path)
-      ? "bg-yellow-200 text-orange-600"
-      : "text-gray-700 hover:bg-green-100";
+  const isActive = (path) => {
+    const pathname = location.pathname;
+    // Only highlight if it's an exact match (not a parent of another route)
+    if (pathname === path || pathname === path + "/") {
+      return "bg-yellow-200 text-orange-600";
+    }
+    return "text-gray-700 hover:bg-green-100";
+  };
 
   const Item = ({ to, icon: Icon, label }) => (
     <Link

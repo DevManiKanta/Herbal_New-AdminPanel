@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import api from "../api/axios";
+import toast from "react-hot-toast";
 
 export default function StaffAttendanceCalendar() {
   /* ================= OT CALUCTION ================= */
@@ -163,8 +164,6 @@ export default function StaffAttendanceCalendar() {
 
   /* ================= ADD STAFF ================= */
   const addStaff = async () => {
-    // if (!staffForm.name || !staffForm.phone || !staffForm.email)
-
     if (
       !staffForm.name ||
       !staffForm.phone ||
@@ -172,12 +171,24 @@ export default function StaffAttendanceCalendar() {
       !staffForm.salary ||
       !staffForm.joining_date
     ) {
-      alert("Please fill all required fields");
+      toast.error("Please fill all required fields", {
+        duration: 4000,
+        position: "top-right",
+        style: {
+          background: "#ef4444",
+          color: "#fff",
+          borderRadius: "8px",
+          padding: "16px",
+          fontSize: "14px",
+          fontWeight: "500",
+        },
+        icon: "⚠️",
+      });
       return;
     }
 
     try {
-      await api.post("/admin-dashboard/add-staff", {
+      const res = await api.post("/admin-dashboard/add-staff", {
         name: staffForm.name,
         phone: staffForm.phone,
         email: staffForm.email,
@@ -187,29 +198,55 @@ export default function StaffAttendanceCalendar() {
         joining_date: staffForm.joining_date,
       });
 
-      setDrawerOpen(false);
-      setStaffForm({
-        name: "",
-        phone: "",
-        email: "",
-        role: "Staff",
-        salary: "",
-        joining_date: "",
-      });
-      fetchStaff();
-    } catch (err) {
-      if (err.response?.status === 422) {
-        alert(err.response.data.error || "Validation error");
-      } else {
-        alert("Something went wrong. Please try again.");
+      if (res.data.success) {
+        toast.success("Staff added successfully!", {
+          duration: 4000,
+          position: "top-right",
+          style: {
+            background: "#10b981",
+            color: "#fff",
+            borderRadius: "8px",
+            padding: "16px",
+            fontSize: "14px",
+            fontWeight: "500",
+          },
+          icon: "✓",
+        });
+
+        setDrawerOpen(false);
+        setStaffForm({
+          name: "",
+          phone: "",
+          email: "",
+          role: "Staff",
+          salary: "",
+          joining_date: "",
+        });
+        fetchStaff();
       }
+    } catch (err) {
+      const errorMessage = err.response?.data?.error || err.response?.data?.message || "Failed to add staff";
+      
+      toast.error(errorMessage, {
+        duration: 5000,
+        position: "top-right",
+        style: {
+          background: "#ef4444",
+          color: "#fff",
+          borderRadius: "8px",
+          padding: "16px",
+          fontSize: "14px",
+          fontWeight: "500",
+        },
+        icon: "✕",
+      });
     }
   };
 
   /* ================= UPDATE EMPLOYEE ================= */
   const updateStaff = async () => {
     try {
-      await api.post(`/admin-dashboard/update-staff/${editForm.id}`, {
+      const res = await api.post(`/admin-dashboard/update-staff/${editForm.id}`, {
         name: editForm.name,
         phone: editForm.phone,
         email: editForm.email,
@@ -217,33 +254,103 @@ export default function StaffAttendanceCalendar() {
         status: editForm.status,
       });
 
-      alert("Staff updated successfully");
-      setEditDrawerOpen(false);
-      fetchStaff();
+      if (res.data.success) {
+        toast.success("Staff updated successfully!", {
+          duration: 4000,
+          position: "top-right",
+          style: {
+            background: "#10b981",
+            color: "#fff",
+            borderRadius: "8px",
+            padding: "16px",
+            fontSize: "14px",
+            fontWeight: "500",
+          },
+          icon: "✓",
+        });
+
+        setEditDrawerOpen(false);
+        fetchStaff();
+      }
     } catch (err) {
-      alert(err.response?.data?.message || "Update failed");
+      const errorMessage = err.response?.data?.error || err.response?.data?.message || "Failed to update staff";
+      
+      toast.error(errorMessage, {
+        duration: 5000,
+        position: "top-right",
+        style: {
+          background: "#ef4444",
+          color: "#fff",
+          borderRadius: "8px",
+          padding: "16px",
+          fontSize: "14px",
+          fontWeight: "500",
+        },
+        icon: "✕",
+      });
     }
   };
 
   /* ================= UPDATE SALARY LOGIC ================= */
   const updateSalary = async () => {
     if (!salaryForm.newSalary || !salaryForm.effective_from) {
-      alert("Please fill all fields");
+      toast.error("Please fill all required fields", {
+        duration: 4000,
+        position: "top-right",
+        style: {
+          background: "#ef4444",
+          color: "#fff",
+          borderRadius: "8px",
+          padding: "16px",
+          fontSize: "14px",
+          fontWeight: "500",
+        },
+        icon: "⚠️",
+      });
       return;
     }
 
     try {
-      await api.post("/admin-dashboard/update-salary", {
+      const res = await api.post("/admin-dashboard/update-salary", {
         user_id: selectedStaffForSalary.id,
         salary: salaryForm.newSalary,
         effective_from: salaryForm.effective_from,
       });
 
-      alert("Salary updated successfully");
-      setSalaryModalOpen(false);
-      fetchStaff();
+      if (res.data.success) {
+        toast.success("Salary updated successfully!", {
+          duration: 4000,
+          position: "top-right",
+          style: {
+            background: "#10b981",
+            color: "#fff",
+            borderRadius: "8px",
+            padding: "16px",
+            fontSize: "14px",
+            fontWeight: "500",
+          },
+          icon: "✓",
+        });
+
+        setSalaryModalOpen(false);
+        fetchStaff();
+      }
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to update salary");
+      const errorMessage = err.response?.data?.error || err.response?.data?.message || "Failed to update salary";
+      
+      toast.error(errorMessage, {
+        duration: 5000,
+        position: "top-right",
+        style: {
+          background: "#ef4444",
+          color: "#fff",
+          borderRadius: "8px",
+          padding: "16px",
+          fontSize: "14px",
+          fontWeight: "500",
+        },
+        icon: "✕",
+      });
     }
   };
 
@@ -297,7 +404,7 @@ export default function StaffAttendanceCalendar() {
     console.log("Attendance Form:", attendanceForm);
 
     try {
-      await api.post("/admin-dashboard/attendance", {
+      const res = await api.post("/admin-dashboard/attendance", {
         user_id: selectedStaff,
         date: formatDate(selectedDay),
         status: attendanceForm.status,
@@ -307,25 +414,55 @@ export default function StaffAttendanceCalendar() {
           attendanceForm.status === "ot" ? attendanceForm.otAmount : null,
       });
 
-      console.log("API Success");
-
-      setAttendance((prev) => ({
-        ...prev,
-        [selectedStaff]: {
-          ...prev[selectedStaff],
-          [formatDate(selectedDay)]: {
-            status: attendanceForm.status,
-            in_time: attendanceForm.inTime,
-            out_time: attendanceForm.outTime,
-            ot_amount: attendanceForm.otAmount,
+      if (res.data.success) {
+        toast.success("Attendance saved successfully!", {
+          duration: 4000,
+          position: "top-right",
+          style: {
+            background: "#10b981",
+            color: "#fff",
+            borderRadius: "8px",
+            padding: "16px",
+            fontSize: "14px",
+            fontWeight: "500",
           },
-        },
-      }));
+          icon: "✓",
+        });
 
-      setPopupOpen(false);
+        console.log("API Success");
+
+        setAttendance((prev) => ({
+          ...prev,
+          [selectedStaff]: {
+            ...prev[selectedStaff],
+            [formatDate(selectedDay)]: {
+              status: attendanceForm.status,
+              in_time: attendanceForm.inTime,
+              out_time: attendanceForm.outTime,
+              ot_amount: attendanceForm.otAmount,
+            },
+          },
+        }));
+
+        setPopupOpen(false);
+      }
     } catch (err) {
       console.log("API ERROR:", err.response);
-      alert(err.response?.data?.message || "Failed to save attendance");
+      const errorMessage = err.response?.data?.error || err.response?.data?.message || "Failed to save attendance";
+      
+      toast.error(errorMessage, {
+        duration: 5000,
+        position: "top-right",
+        style: {
+          background: "#ef4444",
+          color: "#fff",
+          borderRadius: "8px",
+          padding: "16px",
+          fontSize: "14px",
+          fontWeight: "500",
+        },
+        icon: "✕",
+      });
     }
   };
 
@@ -824,7 +961,7 @@ export default function StaffAttendanceCalendar() {
                 className="border px-3 py-2 rounded-lg w-full bg-white focus:ring-2 focus:ring-black outline-none"
               >
                 <option>Staff</option>
-                <option>Manager</option>
+                {/* <option>Manager</option> */}
               </select>
             </div>
 
@@ -1024,7 +1161,7 @@ export default function StaffAttendanceCalendar() {
                 className="w-full border px-3 py-2 rounded-lg"
               >
                 <option value="employee">Staff</option>
-                <option value="employeer">Manager</option>
+                {/* <option value="employeer">Manager</option> */}
               </select>
             </div>
 

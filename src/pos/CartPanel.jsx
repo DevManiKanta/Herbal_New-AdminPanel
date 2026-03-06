@@ -8,7 +8,8 @@ export default function CartPanel({ cart = [], setCart }) {
 
 
   const [showOrderHistory, setShowOrderHistory] = useState(false);
-const [orderHistory, setOrderHistory] = useState([]);
+  const [orderHistory, setOrderHistory] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
 
 
   const [customer, setCustomer] = useState({
@@ -394,7 +395,6 @@ const [orderHistory, setOrderHistory] = useState([]);
       setLoading(false);
     }
   };
-
   return (
     <div className="w-96 bg-white border-l flex flex-col h-screen">
       {/* HEADER */}
@@ -415,6 +415,7 @@ const [orderHistory, setOrderHistory] = useState([]);
 
             if (val.length === 10) {
               try {
+                setSearchLoading(true);
                 const res = await api.get(
                   `/admin-dashboard/pos/search-user?phone=${val}`,
                 );
@@ -450,11 +451,14 @@ const [orderHistory, setOrderHistory] = useState([]);
                 setSelectedCustomer(null);
                 setAddresses([]);
                 setShowNewAddress(false);
+              } finally {
+                setSearchLoading(false);
               }
             }
           }}
           placeholder="Mobile Number"
           className="w-full border rounded-lg px-3 py-2 text-sm"
+          disabled={searchLoading}
         />
 
         <input
@@ -633,7 +637,6 @@ const [orderHistory, setOrderHistory] = useState([]);
                     className="border rounded px-3 py-2 text-sm"
                   />
                 </div>
-
                 <input
                   placeholder="Pincode"
                   maxLength={6}
@@ -798,12 +801,19 @@ const [orderHistory, setOrderHistory] = useState([]);
       <div className="p-4 border-t">
         <button
           disabled={
-            cart.length === 0 || !customer.name || !isValidPhone(customer.phone)
+            cart.length === 0 || !customer.name || !isValidPhone(customer.phone) || loading
           }
           onClick={handleSubmit}
-          className="w-full bg-green-700 text-white py-4 rounded-2xl disabled:opacity-40"
+          className="w-full bg-green-700 text-white py-4 rounded-2xl disabled:opacity-40 flex items-center justify-center gap-2 font-semibold"
         >
-          Proceed to Pay ₹ {total.toFixed(2)}
+          {loading ? (
+            <>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              Processing...
+            </>
+          ) : (
+            `Proceed to Pay ₹ ${total.toFixed(2)}`
+          )}
         </button>
       </div>
 
@@ -818,12 +828,14 @@ const [orderHistory, setOrderHistory] = useState([]);
               onChange={(e) => setOtp(e.target.value)}
               placeholder="Enter OTP"
               className="w-full border rounded px-3 py-2 text-center"
+              disabled={loading}
             />
 
             <div className="flex justify-between">
               <button
                 onClick={() => setShowOtpModal(false)}
-                className="text-gray-500"
+                className="text-gray-500 disabled:opacity-50"
+                disabled={loading}
               >
                 Cancel
               </button>
@@ -831,9 +843,16 @@ const [orderHistory, setOrderHistory] = useState([]);
               <button
                 onClick={handleVerifyOtp}
                 disabled={loading}
-                className="bg-green-700 text-white px-4 py-2 rounded"
+                className="bg-green-700 text-white px-4 py-2 rounded flex items-center gap-2 disabled:opacity-50"
               >
-                {loading ? "Verifying..." : "Verify"}
+                {loading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Verifying...
+                  </>
+                ) : (
+                  "Verify"
+                )}
               </button>
             </div>
           </div>
@@ -930,6 +949,18 @@ const [orderHistory, setOrderHistory] = useState([]);
     </div>
   </div>
 )}
+
+      {/* FULL SCREEN LOADER */}
+      {(loading || searchLoading) && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-8 text-center">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mb-4"></div>
+            <p className="text-gray-700 font-medium">
+              {searchLoading ? "Searching customer..." : "Processing..."}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -33,10 +33,10 @@ export default function ProductCard({ product, onClick }) {
       onMouseEnter={startHover}
       onMouseLeave={stopHover}
       onClick={() => onClick(product)}
-      className="bg-white rounded-2xl border cursor-pointer hover:shadow-lg transition overflow-hidden"
+      className="bg-white rounded-2xl border cursor-pointer hover:shadow-lg transition overflow-hidden h-48 flex flex-col"
     >
       {/* IMAGE */}
-      <div className="relative h-32 bg-gray-100">
+      <div className="relative h-24 bg-gray-100 flex-shrink-0">
         {images.length > 0 ? (
           <img
             src={images[index]?.image_url}
@@ -51,12 +51,14 @@ export default function ProductCard({ product, onClick }) {
       </div>
 
       {/* INFO */}
-      <div className="p-3">
-        <h4 className="text-sm font-medium line-clamp-2">{product.name}</h4>
+      <div className="p-2 flex-1 flex flex-col justify-between">
+        <div>
+          <h4 className="text-xs font-medium line-clamp-2">{product.name}</h4>
 
-        <p className="text-sm font-semibold mt-1">
-          ₹ {variants?.[0]?.price || 0}
-        </p>
+          <p className="text-sm font-semibold mt-1">
+            ₹ {variants?.[0]?.price || 0}
+          </p>
+        </div>
 
         <p className="text-xs text-gray-500">
           {variants?.length || 0} variants

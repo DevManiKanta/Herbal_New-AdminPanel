@@ -285,7 +285,7 @@ export default function Dashboard() {
       </div>
 
       {/* Orders Chart */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 animate-fade-in" style={{ animationDelay: "200ms" }}>
+      {/* <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 animate-fade-in" style={{ animationDelay: "200ms" }}>
         <h3 className="text-lg font-semibold text-gray-900 mb-6">Orders Overview</h3>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={orderData}>
@@ -303,7 +303,7 @@ export default function Dashboard() {
             />
           </BarChart>
         </ResponsiveContainer>
-      </div>
+      </div> */}
 
       {/* Bottom Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
