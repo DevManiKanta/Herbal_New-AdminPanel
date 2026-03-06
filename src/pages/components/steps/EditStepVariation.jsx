@@ -49,6 +49,11 @@ const EditStepVariation = forwardRef(
         combo.combination_values.forEach((cv) => {
           const variationId = cv.value.variation_id;
 
+          // Initialize if not exists
+          if (!sel[variationId]) {
+            sel[variationId] = [];
+          }
+
           sel[variationId].push({
             id: cv.value.id,
             value: cv.value.value,
@@ -153,28 +158,31 @@ const EditStepVariation = forwardRef(
     /* ================= LOAD VARIATIONS ================= */
     useEffect(() => {
       (async () => {
-        const res = await api.get("/admin-dashboard/get-variations");
-        const raw = Array.isArray(res.data?.data) ? res.data.data : [];
+        try {
+          const res = await api.get("/admin-dashboard/get-variations");
+          const raw = Array.isArray(res.data?.data) ? res.data.data : [];
 
-        const normalized = raw.map((v) => ({
-          id: v.id,
-          name: v.name,
-          values: Array.isArray(v.values)
-            ? v.values.map((val) => ({
-                id: val.id,
-                value: val.value,
-              }))
-            : [],
-        }));
+          const normalized = raw.map((v) => ({
+            id: v.id,
+            name: v.name,
+            type: v.type || "text",
+            values: Array.isArray(v.values)
+              ? v.values.map((val) => ({
+                  id: val.id,
+                  value: val.value,
+                  color_code: val.color_code || null,
+                }))
+              : [],
+          }));
 
-        setVariations(normalized);
+          setVariations(normalized);
 
-        const init = {};
-        normalized.forEach((v) => (init[v.id] = []));
-        setSelected(init);
-
-        // 🔥 ADD THIS LINE
-        // setInitialized(true);
+          const init = {};
+          normalized.forEach((v) => (init[v.id] = []));
+          setSelected(init);
+        } catch (err) {
+          console.error("Failed to load variations:", err);
+        }
       })();
     }, []);
     /* ================= IMAGE HANDLERS ================= */
@@ -263,22 +271,28 @@ const EditStepVariation = forwardRef(
       <div className="bg-white rounded-xl border p-6 space-y-6">
         <h3 className="text-lg font-semibold">Product Variations</h3>
 
-        {variations.map((v) => (
-          <EditVariantSelect
-            key={v.id}
-            label={v.name}
-            options={v.values}
-            selected={selected[v.id] || []}
-            // onChange={(vals) => setSelected((p) => ({ ...p, [v.id]: vals }))}
-
-            onChange={(vals) =>
-              setSelected((p) => ({
-                ...p,
-                [v.id]: [...vals],
-              }))
-            }
-          />
-        ))}
+        {variations.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            <p>Loading variations...</p>
+          </div>
+        ) : (
+          <>
+            {variations.map((v) => (
+              <EditVariantSelect
+                key={v.id}
+                label={v.name}
+                options={v.values || []}
+                selected={selected[v.id] || []}
+                onChange={(vals) =>
+                  setSelected((p) => ({
+                    ...p,
+                    [v.id]: [...vals],
+                  }))
+                }
+              />
+            ))}
+          </>
+        )}
 
         {labels.length > 0 && (
           <EditVariantTable

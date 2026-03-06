@@ -105,8 +105,8 @@ export default function Products() {
   const handleDownloadSampleData = () => {
     try {
       const link = document.createElement("a");
-      link.href = "/SampleData.xlsx";
-      link.setAttribute("download", "SampleData.xlsx");
+      link.href = "/final_test.xlsx";
+      link.setAttribute("download", "final_test.xlsx");
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

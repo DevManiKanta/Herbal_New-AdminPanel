@@ -271,29 +271,22 @@ export default function Sidebar({ open, setOpen, logout }) {
           {/* ================= EMPLOYEE ================= */}
           {role === "employee" && (
             <>
-              <Item to="/pos" icon={ShoppingCart} label="POS" />
-             
-              <Item to="/pos/orders" icon={Package} label="POS Orders" />
+              {isHerbal && (
+                <>
+                  <Item to="/pos" icon={ShoppingCart} label="POS" />
+                  <Item to="/pos/orders" icon={Package} label="POS Orders" />
+                  <Item to="/staff-attendance" icon={Users} label="Staff Attendance" />
+                  <Item to="/customers" icon={Users} label="Customers" />
+                </>
+              )}
 
-            
-
-                  
-                       
-              <Item
-                to="/staff-attendance"
-                icon={Users}
-                label="Staff Attendance"
-              />
-
-
-                <Item
-                to="/customers"
-                icon={Users}
-                label="Customers"
-              />
-
-
-              
+              {isHamsini && (
+                <>
+                  <Item to="/pos" icon={ShoppingCart} label="POS" />
+                  <Item to="/pos/orders" icon={Package} label="POS Orders" />
+                  <Item to="/staff-attendance" icon={Users} label="Staff Attendance" />
+                </>
+              )}
             </>
           )}
 
