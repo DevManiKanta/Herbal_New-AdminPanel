@@ -234,7 +234,8 @@ export default function Products() {
 
               {/*<th className="px-4 py-3 text-left">Brand</th> */}
 
-              <th className="px-4 py-3 text-left">Price</th>
+              <th className="px-4 py-3 text-left">Min Price</th>
+              <th className="px-4 py-3 text-left">Max Price</th>
               <th className="px-4 py-3 text-left">Status</th>
               <th className="px-4 py-3 text-left">Sections</th>
               <th className="px-4 py-3 text-left">Action</th>
@@ -292,7 +293,8 @@ export default function Products() {
                   </td>
 
                   {/* <td className="px-4 py-3">{p.brand_name || "-"}</td> */}
-                  <td className="px-4 py-3">₹{p.final_price}</td>
+                  <td className="px-4 py-3">₹{p.min_price}</td>
+                  <td className="px-4 py-3">₹{p.max_price}</td>
                   <td className="px-4 py-3">
                     <StatusBadge status={p.status} />
                   </td>

@@ -193,12 +193,10 @@ import {
   Box,
   Tag,
   ShoppingCart,
-  BarChart,
   Package,
   Settings,
   Users,
 } from "lucide-react";
-import { useProfile } from "../context/ProfileContext";
 import { useLogoSettings } from "../context/LogoSettingsContext";
 import defaultimage from "../assets/profile.jpg";
 import { isHerbal, isHamsini } from "../config/projectConfig.js";
@@ -279,12 +277,11 @@ export default function Sidebar({ open, setOpen, logout }) {
                   <Item to="/customers" icon={Users} label="Customers" />
                 </>
               )}
-
               {isHamsini && (
                 <>
-                  <Item to="/pos" icon={ShoppingCart} label="POS" />
-                  <Item to="/pos/orders" icon={Package} label="POS Orders" />
-                  <Item to="/staff-attendance" icon={Users} label="Staff Attendance" />
+                  {/* <Item to="/pos" icon={ShoppingCart} label="POS" /> */}
+                  <Item to="/orders" icon={Package} label="Orders" />
+                  {/* <Item to="/staff-attendance" icon={Users} label="Staff Attendance" /> */}
                 </>
               )}
             </>

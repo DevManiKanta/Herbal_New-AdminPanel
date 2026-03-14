@@ -97,19 +97,28 @@ function AppRoutes() {
         {/* ================= EMPLOYEE ================= */}
         {role === "employee" && (
           <>
-            {/* <Route path="/dashboard" element={<Dashboard />} /> */}
-            <Route path="/pos" element={<POS />} />
+            {isHerbal && (
+              <>
+                <Route path="/pos" element={<POS />} />
+                <Route path="/pos/orders" element={<ManualOrders1 />} />
+                <Route
+                  path="/calling/order/:id"
+                  element={<ManualOrderDetails />}
+                />
+                <Route path="/customers" element={<CustomerManagement />} />
+                <Route path="/pos/orders/:id" element={<POSOrderView />} />
+                <Route path="/staff-attendance" element={<MyAttendance />} />
+                <Route path="*" element={<Navigate to="/pos" />} />
+              </>
+            )}
 
-            <Route path="/pos/orders" element={<ManualOrders1 />} />
-            <Route
-              path="/calling/order/:id"
-              element={<ManualOrderDetails />}
-            />
-
-            <Route path="/customers" element={<CustomerManagement />} />
-            <Route path="/pos/orders/:id" element={<POSOrderView />} />
-            <Route path="/staff-attendance" element={<MyAttendance />} />
-            <Route path="*" element={<Navigate to="/pos" />} />
+            {isHamsini && (
+              <>
+                <Route path="/orders" element={<POSOrders />} />
+                <Route path="/orders/:id" element={<OrderDetail />} />
+                <Route path="*" element={<Navigate to="/orders" />} />
+              </>
+            )}
           </>
         )}
 
