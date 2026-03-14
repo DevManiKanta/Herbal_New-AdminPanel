@@ -149,7 +149,7 @@ export default function OrdersPage() {
       setOrders(res.data.data || []);
       setPagination(res.data.pagination || { totalPages: 1 });
     } catch (err) {
-      console.error("ORDERS LOAD ERROR:", err);
+
     } finally {
       setLoading(false);
     }
@@ -161,7 +161,7 @@ export default function OrdersPage() {
       const res = await api.get("/cart/online-orders/stats");
       setStats(res.data.data || {});
     } catch (err) {
-      console.error("STATS LOAD ERROR:", err);
+
     }
   };
 
@@ -170,7 +170,7 @@ export default function OrdersPage() {
       const res = await api.get("/cart/online-orders/status-counts");
       setStatusCounts(res.data.data || {});
     } catch (err) {
-      console.error("COUNT LOAD ERROR:", err);
+
     }
   };
   const changeOrderStatus = async (orderId, status) => {

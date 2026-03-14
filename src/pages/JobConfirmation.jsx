@@ -56,10 +56,10 @@ export default function JobConfirmation() {
   /* SUBMIT */
   const handleSubmit = () => {
     if (isEdit) {
-      console.log("UPDATE CONFIRMATION", form);
+
       // PUT /confirmation/:id
     } else {
-      console.log("CREATE CONFIRMATION", form);
+
       // POST /confirmation
     }
 

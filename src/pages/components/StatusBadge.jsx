@@ -1,5 +1,5 @@
 export default function StatusBadge({ status }) {
-  console.log("satys", status);
+
   const map = {
     Published: {
       text: "Published",

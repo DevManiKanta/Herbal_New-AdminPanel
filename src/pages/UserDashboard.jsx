@@ -79,7 +79,7 @@ export default function UserDashboard() {
         })),
       );
     } catch (error) {
-      console.error("Dashboard error:", error.message);
+
     } finally {
       setLoading(false);
     }

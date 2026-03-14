@@ -33,7 +33,7 @@ export default function VariationSettings() {
 
       setVariations(normalized);
     } catch (err) {
-      console.error(err);
+
     }
   };
 

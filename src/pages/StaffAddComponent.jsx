@@ -56,7 +56,7 @@ export default function StaffAddComponent() {
           onClick={() => setShowForm(true)}
           className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm"
         >
-          + Add Staff
+          + Add Staffs
         </button>
       </div>
 

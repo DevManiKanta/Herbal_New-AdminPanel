@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 export default function ConfirmationPrint() {
   const { id } = useParams();
 
-  console.log("Confirmation ID:", id); // 👈 must log
+
 
   const printRef = useRef();
 

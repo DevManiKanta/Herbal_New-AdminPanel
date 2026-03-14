@@ -106,7 +106,7 @@ export default function Dashboard() {
         setOrderData(DUMMY_ORDER_DATA);
       }
     } catch (error) {
-      console.error("Dashboard fetch failed:", error);
+
       setError(error.response?.data?.message || "Failed to fetch dashboard data");
       // Use dummy data on error
       setRevenueData(DUMMY_REVENUE_DATA);
@@ -225,64 +225,7 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
-        {/* Revenue Chart - Larger */}
-        <div className="xl:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-gray-100 animate-fade-in">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">Revenue Overview</h3>
-            <select className="text-sm border border-gray-300 rounded-lg px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option>2023</option>
-              <option>2024</option>
-              <option>2025</option>
-            </select>
-          </div>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={revenueData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="month" stroke="#9ca3af" />
-              <Tooltip 
-                contentStyle={{ backgroundColor: "#fff", border: "1px solid #e5e7eb", borderRadius: "8px" }}
-                formatter={(value) => `₹${value.toLocaleString()}`}
-              />
-              <Line
-                type="monotone"
-                dataKey="revenue"
-                stroke="#3b82f6"
-                strokeWidth={3}
-                dot={{ fill: "#3b82f6", r: 5 }}
-                activeDot={{ r: 7 }}
-                isAnimationActive={true}
-                animationDuration={800}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
 
-        {/* Pie Chart */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 animate-fade-in" style={{ animationDelay: "100ms" }}>
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">Distribution</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={revenueData.slice(0, 3)}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={100}
-                paddingAngle={2}
-                dataKey="revenue"
-                isAnimationActive={true}
-                animationDuration={800}
-              >
-                <Cell fill="#0ea5e9" />
-                <Cell fill="#06b6d4" />
-                <Cell fill="#14b8a6" />
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
 
       {/* Orders Chart */}
       {/* <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8 animate-fade-in" style={{ animationDelay: "200ms" }}>
@@ -306,7 +249,7 @@ export default function Dashboard() {
       </div> */}
 
       {/* Bottom Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl p-6 text-white shadow-lg animate-fade-in" style={{ animationDelay: "300ms" }}>
           <div className="flex justify-between items-start">
             <div>
@@ -336,7 +279,7 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <style>{`
         @keyframes fadeIn {

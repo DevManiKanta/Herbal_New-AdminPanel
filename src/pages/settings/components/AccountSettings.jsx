@@ -17,7 +17,7 @@ export default function AccountSettings() {
   };
 
   const handleSave = () => {
-    console.log("GST Settings:", gst);
+
     setEditMode(false);
   };
 

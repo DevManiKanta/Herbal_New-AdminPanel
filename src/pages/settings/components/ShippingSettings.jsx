@@ -235,7 +235,7 @@ export default function ShippingSettings() {
 
       const res = await api.get("/admin-dashboard/shipping");
 
-      console.log("Shipping API Response:", res.data);
+
 
       if (res?.data?.success && typeof res.data.data === "object") {
         const apiData = res.data.data;
@@ -267,7 +267,7 @@ export default function ShippingSettings() {
           },
         }));
       } else {
-        console.warn("Invalid shipping response structure");
+
       }
     } catch (err) {
       const message =

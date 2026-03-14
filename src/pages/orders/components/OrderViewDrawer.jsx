@@ -59,7 +59,7 @@ export default function OrderViewDrawer({ order, onClose }) {
             <ShippingDetails
               order={order}
               onSave={(shipping) => {
-                console.log("Shipping details:", shipping);
+
 
                 // 🔗 API CALL HERE
                 // saveShipping(order.id, shipping);

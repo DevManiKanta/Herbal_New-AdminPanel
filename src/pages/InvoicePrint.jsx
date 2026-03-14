@@ -5,7 +5,7 @@ export default function InvoicePrint() {
   const { id } = useParams();
 
   useEffect(() => {
-    console.log("Invoice for Confirmation ID:", id);
+
   }, [id]);
 
   const handlePrint = () => window.print();

@@ -27,7 +27,7 @@ export default function EditProductSections({ productId }) {
 
       setSelected(assigned);
     } catch {
-      console.log("Failed to load assigned sections");
+
     }
   };
 

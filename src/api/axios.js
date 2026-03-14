@@ -1,4 +1,5 @@
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -16,7 +17,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-// RESPONSE → handle 401 & 422 globally
+// RESPONSE → handle 401 globally only
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -27,13 +28,19 @@ api.interceptors.response.use(
     if (status === 401 && token) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      alert("Session expired. Please login again.");
-      window.location.href = "/login";
+      toast.error("Session expired. Please login again.", {
+        duration: 4000,
+        position: "top-right",
+      });
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 500);
     }
 
-    if (status === 422) {
-      alert(error.response.data.message);
-    }
+    // Log the full error response for debugging
+
+    // Don't handle other errors here - let components handle them
+    // This allows components to show custom error messages with toast
 
     return Promise.reject(error);
   },

@@ -30,7 +30,7 @@ export default function POSOrderView() {
       const res = await api.get(`/admin-dashboard/orders-details/${id}`);
       setOrder(res.data.data);
     } catch (err) {
-      console.error("ORDER VIEW ERROR:", err);
+
       alert("Failed to load order");
     } finally {
       setLoading(false);

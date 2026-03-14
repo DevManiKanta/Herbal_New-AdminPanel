@@ -25,7 +25,7 @@ export default function CustomerManagement() {
       setCustomers(res.data.data);
       setMeta(res.data.meta);
     } catch (error) {
-      console.error("Failed to load customers", error);
+
     } finally {
       setLoading(false);
     }
@@ -85,12 +85,12 @@ Jane Smith,9123456789"
           className="w-full border rounded-lg p-3 h-32 text-sm"
         />
 
-        <button
+        {/* <button
           onClick={handleBulkUpload}
           className="bg-green-600 text-white px-4 py-2 rounded-lg"
         >
           Upload Bulk Customers
-        </button>
+        </button> */}
       </div>
 
       {/* ================= TABLE ================= */}

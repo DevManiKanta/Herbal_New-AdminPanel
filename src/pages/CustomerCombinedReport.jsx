@@ -22,7 +22,7 @@ export default function CustomerCombinedReport() {
       setCustomers(res.data.data);
       setMeta(res.data.meta);
     } catch (error) {
-      console.error("Failed to load customers", error);
+
     } finally {
       setLoading(false);
     }

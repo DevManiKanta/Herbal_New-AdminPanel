@@ -22,9 +22,21 @@ export const ProfileProvider = ({ children }) => {
       const res = await api.get("/admin-dashboard/profile");
       setProfile(res.data.user);
     } catch (err) {
-      toast.error(
-        err.response?.data?.message || "Failed to load profile"
-      );
+      const errorMessage = err.response?.data?.message || "Failed to load profile";
+      toast.error(errorMessage, {
+        duration: 4000,
+        position: "top-right",
+        style: {
+          background: "#ef4444",
+          color: "#fff",
+          borderRadius: "8px",
+          padding: "16px",
+          fontSize: "14px",
+          fontWeight: "500",
+          zIndex: 99999,
+        },
+        icon: "⚠️",
+      });
     } finally {
       setLoading(false);
     }
@@ -41,19 +53,60 @@ export const ProfileProvider = ({ children }) => {
       );
 
       if (res.data?.success === false) {
-        toast.error(res.data.errors || "Update failed");
+        const errorMessage = res.data.errors || "Update failed";
+        toast.error(errorMessage, {
+          duration: 5000,
+          position: "top-right",
+          style: {
+            background: "#ef4444",
+            color: "#fff",
+            borderRadius: "8px",
+            padding: "16px",
+            fontSize: "14px",
+            fontWeight: "500",
+            zIndex: 99999,
+          },
+          icon: "⚠️",
+        });
         return false;
       }
 
-      toast.success("Profile updated successfully");
+      toast.success("Profile updated successfully!", {
+        duration: 4000,
+        position: "top-right",
+        style: {
+          background: "#10b981",
+          color: "#fff",
+          borderRadius: "8px",
+          padding: "16px",
+          fontSize: "14px",
+          fontWeight: "500",
+          zIndex: 99999,
+        },
+        icon: "✓",
+      });
       await getProfile();
       return true;
     } catch (err) {
-      toast.error(
+      const errorMessage = 
         err.response?.data?.errors ||
-          err.response?.data?.message ||
-          "Something went wrong"
-      );
+        err.response?.data?.message ||
+        "Something went wrong";
+      
+      toast.error(errorMessage, {
+        duration: 5000,
+        position: "top-right",
+        style: {
+          background: "#ef4444",
+          color: "#fff",
+          borderRadius: "8px",
+          padding: "16px",
+          fontSize: "14px",
+          fontWeight: "500",
+          zIndex: 99999,
+        },
+        icon: "⚠️",
+      });
       return false;
     } finally {
       setLoading(false);
@@ -70,16 +123,55 @@ export const ProfileProvider = ({ children }) => {
       );
 
       if (res.data?.success === false) {
-        toast.error(res.data.errors || "Failed to remove avatar");
+        const errorMessage = res.data.errors || "Failed to remove avatar";
+        toast.error(errorMessage, {
+          duration: 5000,
+          position: "top-right",
+          style: {
+            background: "#ef4444",
+            color: "#fff",
+            borderRadius: "8px",
+            padding: "16px",
+            fontSize: "14px",
+            fontWeight: "500",
+            zIndex: 99999,
+          },
+          icon: "⚠️",
+        });
         return;
       }
 
-      toast.success("Avatar removed");
+      toast.success("Avatar removed successfully!", {
+        duration: 4000,
+        position: "top-right",
+        style: {
+          background: "#10b981",
+          color: "#fff",
+          borderRadius: "8px",
+          padding: "16px",
+          fontSize: "14px",
+          fontWeight: "500",
+          zIndex: 99999,
+        },
+        icon: "✓",
+      });
       await getProfile();
     } catch (err) {
-      toast.error(
-        err.response?.data?.message || "Failed to remove avatar"
-      );
+      const errorMessage = err.response?.data?.message || "Failed to remove avatar";
+      toast.error(errorMessage, {
+        duration: 5000,
+        position: "top-right",
+        style: {
+          background: "#ef4444",
+          color: "#fff",
+          borderRadius: "8px",
+          padding: "16px",
+          fontSize: "14px",
+          fontWeight: "500",
+          zIndex: 99999,
+        },
+        icon: "⚠️",
+      });
     } finally {
       setLoading(false);
     }

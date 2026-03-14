@@ -315,7 +315,7 @@ export default function Sidebar({ open, setOpen, logout }) {
                     label="Online Orders"
                   />
                   <Item to="/customers" icon={Users} label="Customers" />
-                  <Item to="/users" icon={Users} label="Users" />
+                  {/* <Item to="/users" icon={Users} label="Users" /> */}
                   <Item
                     to="/staff-attendance"
                     icon={Users}
@@ -328,15 +328,14 @@ export default function Sidebar({ open, setOpen, logout }) {
                   />
                 </>
               )}
-
               {isHamsini && (
                 <>
                   <Item to="/dashboard" icon={Home} label="Dashboard" />
                   <Item to="/products" icon={Box} label="Products" />
-                       <Item to="/bulk-variant-images" icon={Box} label="Bulk Variant Images" />
+                       {/* <Item to="/bulk-variant-images" icon={Box} label="Bulk Variant Images" /> */}
                   <Item to="/categories" icon={Tag} label="Category" />
                   <Item to="/orders" icon={Package} label="Orders" />
-                  <Item to="/users" icon={Users} label="Users" />
+                  {/* <Item to="/users" icon={Users} label="Users" /> */}
                   <Item
                     to="/staff-attendance"
                     icon={Users}

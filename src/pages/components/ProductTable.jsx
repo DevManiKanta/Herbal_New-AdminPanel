@@ -25,7 +25,7 @@ export default function ProductTable({ onEdit }) {
 
       setProducts(res.data.data || []);
     } catch (error) {
-      console.error("FETCH PRODUCTS ERROR:", error);
+
     } finally {
       setLoading(false);
     }

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import api from "../../../api/axios";
 import RichTextEditor from "../RichTextEditor";
 
-export default function StepBasic({ setStep, setProductId }) {
+export default function StepBasic({ setStep, setProductId, setError }) {
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
   const [categories, setCategories] = useState([]);
@@ -89,7 +89,7 @@ export default function StepBasic({ setStep, setProductId }) {
 
   const handleSubmit = async () => {
     if (!form.name || !form.category_id) {
-      alert("Required fields missing");
+      toast.error("Required fields missing");
       return;
     }
 
@@ -112,8 +112,29 @@ export default function StepBasic({ setStep, setProductId }) {
 
       setProductId(res.data?.product?.id);
       setStep(2);
-    } catch {
-      alert("Something went wrong");
+    } catch (error) {
+      console.error("API Error:", error.response?.data || error);
+      
+      const errorData = error.response?.data;
+      let errorMessage = "Something went wrong";
+
+      if (errorData?.errors) {
+        if (typeof errorData.errors === "string") {
+          errorMessage = errorData.errors;
+        } else if (Array.isArray(errorData.errors)) {
+          errorMessage = errorData.errors
+            .map((err) => err.message || err)
+            .join(", ");
+        } else if (typeof errorData.errors === "object") {
+          errorMessage = Object.entries(errorData.errors)
+            .map(([key, value]) => `${key}: ${value}`)
+            .join(", ");
+        }
+      } else if (errorData?.message) {
+        errorMessage = errorData.message;
+      }
+
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

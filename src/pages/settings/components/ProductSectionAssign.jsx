@@ -9,7 +9,7 @@ export default function ProductSectionAssign({ product, onSaved }) {
   useEffect(() => {
     if (!product) return;
 
-    console.log("Product for section assign:", product);
+
 
     const fetchSections = async () => {
       const res = await api.get("/admin-dashboard/sections");
@@ -42,7 +42,7 @@ export default function ProductSectionAssign({ product, onSaved }) {
       alert("Sections updated successfully");
       onSaved();
     } catch (error) {
-      console.error("SECTION UPDATE ERROR:", error.response?.data || error);
+
       alert(
         error.response?.data?.message ||
           error.response?.data?.errors ||

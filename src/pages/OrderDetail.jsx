@@ -15,7 +15,7 @@ export default function OrderDetail() {
       const res = await api.get(`/cart/online-orders/${id}`);
       setOrder(res.data.data);
     } catch (err) {
-      console.error("ORDER DETAIL ERROR:", err);
+
     } finally {
       setLoading(false);
     }

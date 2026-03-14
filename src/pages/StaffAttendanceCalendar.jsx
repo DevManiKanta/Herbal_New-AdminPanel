@@ -114,7 +114,7 @@ export default function StaffAttendanceCalendar() {
         setSelectedStaff(res.data.data[0].id);
       }
     } catch (err) {
-      console.error("Failed to fetch staff", err);
+
     }
   };
 
@@ -291,6 +291,51 @@ export default function StaffAttendanceCalendar() {
     }
   };
 
+  /* ================= DELETE STAFF ================= */
+  const deleteStaff = async (staffId) => {
+    if (!window.confirm("Are you sure you want to delete this staff member?")) {
+      return;
+    }
+
+    try {
+      const res = await api.delete(`/admin-dashboard/delete-staff/${staffId}`);
+
+      if (res.data.success) {
+        toast.success("Staff deleted successfully!", {
+          duration: 4000,
+          position: "top-right",
+          style: {
+            background: "#10b981",
+            color: "#fff",
+            borderRadius: "8px",
+            padding: "16px",
+            fontSize: "14px",
+            fontWeight: "500",
+          },
+          icon: "✓",
+        });
+
+        fetchStaff();
+      }
+    } catch (err) {
+      const errorMessage = err.response?.data?.error || err.response?.data?.message || "Failed to delete staff";
+      
+      toast.error(errorMessage, {
+        duration: 5000,
+        position: "top-right",
+        style: {
+          background: "#ef4444",
+          color: "#fff",
+          borderRadius: "8px",
+          padding: "16px",
+          fontSize: "14px",
+          fontWeight: "500",
+        },
+        icon: "✕",
+      });
+    }
+  };
+
   /* ================= UPDATE SALARY LOGIC ================= */
   const updateSalary = async () => {
     if (!salaryForm.newSalary || !salaryForm.effective_from) {
@@ -372,7 +417,7 @@ export default function StaffAttendanceCalendar() {
           [selectedStaff]: res.data.data,
         }));
       } catch (err) {
-        console.error("Failed to fetch attendance", err);
+
       }
     };
 
@@ -398,10 +443,7 @@ export default function StaffAttendanceCalendar() {
   };
 
   const saveAttendance = async () => {
-    console.log("Selected Staff:", selectedStaff);
-    console.log("Selected Day:", selectedDay);
-    console.log("Formatted Date:", formatDate(selectedDay));
-    console.log("Attendance Form:", attendanceForm);
+
 
     try {
       const res = await api.post("/admin-dashboard/attendance", {
@@ -429,7 +471,7 @@ export default function StaffAttendanceCalendar() {
           icon: "✓",
         });
 
-        console.log("API Success");
+
 
         setAttendance((prev) => ({
           ...prev,
@@ -447,7 +489,7 @@ export default function StaffAttendanceCalendar() {
         setPopupOpen(false);
       }
     } catch (err) {
-      console.log("API ERROR:", err.response);
+
       const errorMessage = err.response?.data?.error || err.response?.data?.message || "Failed to save attendance";
       
       toast.error(errorMessage, {
@@ -623,7 +665,6 @@ export default function StaffAttendanceCalendar() {
                         {attendance[selectedStaff]?.[formatDate(day)]?.status ||
                           ""}
                       </div>
-
                       {/* Timing */}
                       {attendance[selectedStaff]?.[formatDate(day)]?.in_time &&
                         attendance[selectedStaff]?.[formatDate(day)]
@@ -730,6 +771,12 @@ export default function StaffAttendanceCalendar() {
                         className="text-sm border px-3 py-1 rounded hover:bg-gray-50"
                       >
                         Edit
+                      </button>
+                      <button
+                        onClick={() => deleteStaff(s.id)}
+                        className="text-sm bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                      >
+                        Delete
                       </button>
                     </td>
                   </tr>

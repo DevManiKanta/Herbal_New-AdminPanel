@@ -40,7 +40,7 @@ export default function MyAttendance() {
 
         setAttendance(res.data.data);
       } catch (err) {
-        console.error("Failed to fetch attendance", err);
+
       }
     };
 

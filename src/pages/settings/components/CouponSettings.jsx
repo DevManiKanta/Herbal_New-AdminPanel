@@ -71,7 +71,6 @@ export default function CouponSettings() {
       handleCancel();
       fetchCoupons();
     } catch (err) {
-      console.error(err);
       toast.error("Failed to save coupon");
     }
   };
@@ -85,7 +84,6 @@ export default function CouponSettings() {
       toast.success("Coupon deleted successfully");
       fetchCoupons();
     } catch (err) {
-      console.error(err);
       toast.error("Failed to delete coupon");
     }
   };

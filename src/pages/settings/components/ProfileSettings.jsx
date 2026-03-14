@@ -14,7 +14,7 @@
 
 //   const { profile, getProfile, updateProfile, removeAvatar } =
 //     useProfile();
-// console.log("test",getProfile)
+
 //   const [editMode, setEditMode] = useState(false);
 //   const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
 //   const [avatarFile, setAvatarFile] = useState(null);
@@ -304,9 +304,12 @@ export default function ProfileSettings() {
   };
 
   const handleRemoveAvatar = async () => {
-    await removeAvatar();
+    // Remove immediately from UI
     setAvatar(DEFAULT_AVATAR);
     setAvatarFile(null);
+    
+    // Call API in background
+    await removeAvatar();
   };
 
   return (
@@ -385,12 +388,12 @@ export default function ProfileSettings() {
                 />
               </label>
 
-              <button
+              {/* <button
                 onClick={handleRemoveAvatar}
                 className="px-4 py-1.5 text-sm border text-red-600 rounded-lg hover:bg-red-50"
               >
                 Remove
-              </button>
+              </button> */}
             </div>
           )}
         </div>

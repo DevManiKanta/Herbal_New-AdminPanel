@@ -3,6 +3,7 @@ import CategoryForm from "./CategoryForm";
 import SubCategoryForm from "./SubCategoryForm";
 import useDynamicTitle from "../hooks/useDynamicTitle";
 import api from "../api/axios";
+import toast from "react-hot-toast";
 
 const PAGE_SIZES = [5, 10, 20];
 
@@ -39,7 +40,7 @@ export default function Category() {
       setCategories(res.data.data);
       setTotalPages(res.data.pagination.totalPages);
     } catch (e) {
-      console.error(e);
+
     } finally {
       setLoading(false);
     }
@@ -77,27 +78,95 @@ export default function Category() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Delete this category?")) return;
     try {
       await api.delete(`/admin-dashboard/delete-category/${id}`);
+      toast.success("Category deleted successfully!", {
+        duration: 4000,
+        position: "top-right",
+        style: {
+          background: "#10b981",
+          color: "#fff",
+          borderRadius: "8px",
+          padding: "16px",
+          fontSize: "14px",
+          fontWeight: "500",
+          zIndex: 99999,
+        },
+        icon: "✓",
+      });
       fetchCategories();
     } catch (e) {
-      alert(e.response?.data?.message || "Delete failed");
+      const errorMessage = e.response?.data?.message || "Failed to delete category";
+      toast.error(errorMessage, {
+        duration: 5000,
+        position: "top-right",
+        style: {
+          background: "#ef4444",
+          color: "#fff",
+          borderRadius: "8px",
+          padding: "16px",
+          fontSize: "14px",
+          fontWeight: "500",
+          zIndex: 99999,
+        },
+        icon: "⚠️",
+      });
     }
   };
-
   const handleSave = async (formData, id) => {
     try {
       if (id) {
         await api.post(`/admin-dashboard/update-category/${id}`, formData);
+        toast.success("Category updated successfully!", {
+          duration: 4000,
+          position: "top-right",
+          style: {
+            background: "#10b981",
+            color: "#fff",
+            borderRadius: "8px",
+            padding: "16px",
+            fontSize: "14px",
+            fontWeight: "500",
+            zIndex: 99999,
+          },
+          icon: "✓",
+        });
       } else {
         await api.post("/admin-dashboard/add-category", formData);
+        toast.success("Category added successfully!", {
+          duration: 4000,
+          position: "top-right",
+          style: {
+            background: "#10b981",
+            color: "#fff",
+            borderRadius: "8px",
+            padding: "16px",
+            fontSize: "14px",
+            fontWeight: "500",
+            zIndex: 99999,
+          },
+          icon: "✓",
+        });
       }
       setOpenForm(false);
       setEditData(null);
       fetchCategories();
     } catch (e) {
-      alert(e.response?.data?.message || "Save failed");
+      const errorMessage = e.response?.data?.message || "Failed to save category";
+      toast.error(errorMessage, {
+        duration: 5000,
+        position: "top-right",
+        style: {
+          background: "#ef4444",
+          color: "#fff",
+          borderRadius: "8px",
+          padding: "16px",
+          fontSize: "14px",
+          fontWeight: "500",
+          zIndex: 99999,
+        },
+        icon: "⚠️",
+      });
     }
   };
 

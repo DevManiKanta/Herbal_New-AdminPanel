@@ -13,7 +13,7 @@ export default function EditVariantSelect({
   const isSelected = (opt) => selected.some((s) => s.id === opt.id);
 
   const toggle = (opt) => {
-    console.log("op", opt);
+
     onChange(
       isSelected(opt)
         ? selected.filter((s) => s.id !== opt.id)

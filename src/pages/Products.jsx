@@ -44,7 +44,7 @@ export default function Products() {
     try {
       setLoading(true);
 
-      const res = await api.get("/admin-dashboard/products", {
+      const res = await api.get("/admin-dashboard/products_with_percentge", {
         params: {
           search: query,
           page,
@@ -55,7 +55,7 @@ export default function Products() {
       setProducts(res.data.data || []);
       setTotalPages(res.data.pagination?.totalPages || 1);
     } catch (error) {
-      console.error("FETCH PRODUCTS ERROR:", error);
+
     } finally {
       setLoading(false);
     }
@@ -71,7 +71,7 @@ export default function Products() {
       await api.delete(`/admin-dashboard/delete-product/${id}`);
       fetchProducts();
     } catch (error) {
-      console.error("DELETE ERROR:", error);
+
       alert("Failed to delete product");
     }
   };
@@ -206,21 +206,20 @@ export default function Products() {
           >
             Search
           </button>
-
           <button
             onClick={() => setOpenAdd(true)}
             className="bg-indigo-600 text-white px-4 py-2 rounded-lg"
           >
             + Add Product
           </button>
-
+{/* 
           <button
             onClick={() => setShowBulkModal(true)}
             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition"
           >
             <Upload size={18} />
             Bulk Import
-          </button>
+          </button> */}
         </div>
       </div>
       {/* TABLE */}

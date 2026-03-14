@@ -73,7 +73,7 @@ export default function EditClient() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Updated Client:", form);
+
 
     // API PUT call here
     // navigate("/view-client");

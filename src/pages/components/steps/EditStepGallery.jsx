@@ -432,7 +432,7 @@ const EditStepGallery = forwardRef(
 
           return true;
         } catch (err) {
-          console.error(err);
+
           alert("Failed to save gallery");
           return false;
         } finally {

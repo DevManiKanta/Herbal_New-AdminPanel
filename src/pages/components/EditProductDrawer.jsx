@@ -4,6 +4,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import api from "../../api/axios";
+import toast from "react-hot-toast";
 
 import EditStepBasic from "./steps/EditStepBasic";
 import EditStepGallery from "./steps/EditStepGallery";
@@ -39,7 +40,19 @@ export default function EditProductDrawer({ open, onClose, productId }) {
         setProduct(res.data.data);
       } catch (err) {
         console.error("Failed to fetch product", err);
-        alert("Failed to load product");
+        toast.error("Failed to load product", {
+          duration: 4000,
+          position: "top-center",
+          style: {
+            background: "#ef4444",
+            color: "#fff",
+            borderRadius: "8px",
+            padding: "16px",
+            fontSize: "14px",
+            fontWeight: "500",
+            zIndex: 99999,
+          },
+        });
       } finally {
         setLoading(false);
       }
@@ -203,8 +216,21 @@ export default function EditProductDrawer({ open, onClose, productId }) {
                     <button
                       onClick={async () => {
                         if (!(await taxRef.current?.saveStep())) return;
-                        alert("Product updated successfully");
-                        onClose();
+                        toast.success("Product updated successfully!", {
+                          duration: 4000,
+                          position: "top-center",
+                          style: {
+                            background: "#10b981",
+                            color: "#fff",
+                            borderRadius: "8px",
+                            padding: "16px",
+                            fontSize: "14px",
+                            fontWeight: "500",
+                            zIndex: 99999,
+                          },
+                          icon: "✓",
+                        });
+                        setTimeout(onClose, 1000);
                       }}
                       className="px-8 py-2 rounded-lg text-white bg-green-600"
                     >

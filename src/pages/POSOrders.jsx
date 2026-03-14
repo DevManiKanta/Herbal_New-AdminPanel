@@ -34,7 +34,7 @@ export default function POSOrders() {
       const res = await api.get("/admin-dashboard/orders");
       setOrders(res.data.data || []);
     } catch (e) {
-      console.error(e);
+
     } finally {
       setLoading(false);
     }

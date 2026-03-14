@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import api from "../../../api/axios";
 import RichTextEditor from "../RichTextEditor";
+import toast from "react-hot-toast";
 
 export default function EditStepBasic({ setStep, product }) {
   const [loading, setLoading] = useState(false);
@@ -65,7 +66,19 @@ export default function EditStepBasic({ setStep, product }) {
         const res = await api.get("/admin-dashboard/list-category-all");
         setCategories(res.data?.data || []);
       } catch {
-        alert("Failed to load categories");
+        toast.error("Failed to load categories", {
+          duration: 4000,
+          position: "top-center",
+          style: {
+            background: "#ef4444",
+            color: "#fff",
+            borderRadius: "8px",
+            padding: "16px",
+            fontSize: "14px",
+            fontWeight: "500",
+            zIndex: 99999,
+          },
+        });
       } finally {
         setPageLoading(false);
       }
@@ -111,7 +124,19 @@ export default function EditStepBasic({ setStep, product }) {
 
   const handleSubmit = async () => {
     if (!form.name || !form.category_id) {
-      alert("Required fields missing");
+      toast.error("Required fields missing", {
+        duration: 4000,
+        position: "top-center",
+        style: {
+          background: "#ef4444",
+          color: "#fff",
+          borderRadius: "8px",
+          padding: "16px",
+          fontSize: "14px",
+          fontWeight: "500",
+          zIndex: 99999,
+        },
+      });
       return;
     }
 
@@ -125,16 +150,81 @@ export default function EditStepBasic({ setStep, product }) {
     try {
       setLoading(true);
 
-      await api.post(`/admin-dashboard/update-product/${product.id}`, {
+      const res = await api.post(`/admin-dashboard/update-product/${product.id}`, {
         name: form.name,
         category_id: form.subcategory_id || form.category_id,
         specifications: formattedSpecs,
         extra_details: dynamicData,
       });
 
+      toast.success("Product updated successfully!", {
+        duration: 4000,
+        position: "top-center",
+        style: {
+          background: "#10b981",
+          color: "#fff",
+          borderRadius: "8px",
+          padding: "16px",
+          fontSize: "14px",
+          fontWeight: "500",
+          zIndex: 99999,
+        },
+        icon: "✓",
+      });
+
       setStep(2);
-    } catch {
-      alert("Failed to update product");
+    } catch (error) {
+      
+      const errorData = error.response?.data;
+      let errorMessage = "Failed to update product";
+
+      // Handle different error response formats
+      if (errorData?.errors) {
+        if (typeof errorData.errors === "string") {
+          errorMessage = errorData.errors;
+        } else if (Array.isArray(errorData.errors)) {
+          errorMessage = errorData.errors
+            .map((err) => err.message || err)
+            .join(", ");
+        } else if (typeof errorData.errors === "object") {
+          errorMessage = Object.entries(errorData.errors)
+            .map(([key, value]) => `${key}: ${value}`)
+            .join(", ");
+        }
+      } else if (errorData?.message) {
+        errorMessage = errorData.message;
+      } else if (typeof errorData === "string") {
+        // Handle plain string error responses
+        errorMessage = errorData;
+      } else if (error.response?.status === 500) {
+        // For 500 errors, try to extract meaningful message
+        if (errorData?.error) {
+          errorMessage = errorData.error;
+        } else if (errorData?.exception) {
+          // Extract from Laravel exception message
+          const match = errorData.exception?.match(/Duplicate entry '([^']+)'/);
+          if (match) {
+            errorMessage = `Duplicate entry: "${match[1]}" already exists`;
+          } else {
+            errorMessage = "Database error: This product name or slug already exists";
+          }
+        }
+      }
+
+      toast.error(errorMessage, {
+        duration: 5000,
+        position: "top-center",
+        style: {
+          background: "#ef4444",
+          color: "#fff",
+          borderRadius: "8px",
+          padding: "16px",
+          fontSize: "14px",
+          fontWeight: "500",
+          zIndex: 99999,
+        },
+        icon: "⚠️",
+      });
     } finally {
       setLoading(false);
     }
