@@ -15,24 +15,24 @@ const menu = [
   { label: "Banner-settings", path: "/settings/banner-settings" },
   { label: "Landing Banner Settings", path: "/settings/landing-banner-settings" },
   { label: "Shipping-settings", path: "/settings/shipping-settings" },
-  { label: "Product Sections", path: "/settings/product-sections" },
+  // { label: "Product Sections", path: "/settings/product-sections" },
 
-  {
-    label: "Footer Sections",
-    children: [
-      { label: "Manage Sections", path: "/settings/footer-sections" },
-      { label: "Reorder Sections", path: "/settings/footer-sections/reorder" },
-      { label: "Page Settings", path: "/settings/pages" },
-    ],
-  },
+  // {
+  //   label: "Footer Sections",
+  //   children: [
+  //     { label: "Manage Sections", path: "/settings/footer-sections" },
+  //     { label: "Reorder Sections", path: "/settings/footer-sections/reorder" },
+  //     { label: "Page Settings", path: "/settings/pages" },
+  //   ],
+  // },
 
-  {
-    label: "Blog Sections",
-    children: [
-      { label: "Blog-categories", path: "/settings/blog-categories" },
-      { label: "Blog", path: "/settings/blogs" },
-    ],
-  },
+  // {
+  //   label: "Blog Sections",
+  //   children: [
+  //     { label: "Blog-categories", path: "/settings/blog-categories" },
+  //     { label: "Blog", path: "/settings/blogs" },
+  //   ],
+  // },
 ];
 
 export default function SettingsSidebar() {

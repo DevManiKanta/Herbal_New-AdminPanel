@@ -363,9 +363,7 @@ export default function ProfileSettings() {
             {showBrandName ? "ON" : "OFF"}
           </button>
         </div> */}
-
         <hr />
-
         {/* PROFILE IMAGE */}
         <div className="flex items-center gap-6">
           {/* <div className="w-24 h-24 rounded-full border bg-gray-50 overflow-hidden flex items-center justify-center">
