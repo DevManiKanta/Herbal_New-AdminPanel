@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, forwardRef, useImperativeHandle } from "react";
 import api from "../../../api/axios";
 import RichTextEditor from "../RichTextEditor";
+import { toast } from "react-toastify";
 
-export default function StepBasic({ setStep, setProductId, setError }) {
+const StepBasic = forwardRef(({ setStep, setProductId, setError }, ref) => {
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
   const [categories, setCategories] = useState([]);
@@ -89,8 +90,15 @@ export default function StepBasic({ setStep, setProductId, setError }) {
 
   const handleSubmit = async () => {
     if (!form.name || !form.category_id) {
-      toast.error("Required fields missing");
-      return;
+      toast.error("⚠️ Required fields missing", {
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      return false;
     }
 
     const formattedSpecs = specifications
@@ -110,15 +118,92 @@ export default function StepBasic({ setStep, setProductId, setError }) {
         extra_details: dynamicData,
       });
 
-      setProductId(res.data?.product?.id);
-      setStep(2);
-    } catch (error) {
-      console.error("API Error:", error.response?.data || error);
-      
-      const errorData = error.response?.data;
-      let errorMessage = "Something went wrong";
+      // Check for success response
+      if (res.data?.success === true && res.data?.product?.id) {
+        setProductId(res.data.product.id);
+        
+        toast.success("✅ Product created successfully!", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          style: {
+            background: "#dcfce7",
+            color: "#166534",
+            border: "1px solid #bbf7d0",
+          },
+        });
 
-      if (errorData?.errors) {
+        // Move to next step (Gallery) after short delay
+        setTimeout(() => {
+          setStep(2);
+        }, 500);
+        
+        return true;
+      }
+
+      // Check if response has success: false
+      if (res.data?.success === false) {
+        let errorMessage = "Something went wrong";
+        
+        // Extract error message from response
+        if (res.data?.errors) {
+          if (typeof res.data.errors === "string") {
+            errorMessage = res.data.errors;
+          } else if (typeof res.data.errors === "object") {
+            errorMessage = Object.values(res.data.errors)
+              .flat()
+              .join(", ");
+          }
+        }
+        
+        toast.error(`❌ ${errorMessage}`, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          style: {
+            background: "#fee2e2",
+            color: "#991b1b",
+            border: "1px solid #fecaca",
+          },
+        });
+        setError(errorMessage);
+        return false;
+      }
+
+      // Fallback if no product ID
+      toast.error("❌ Failed to create product", {
+        position: "top-right",
+        autoClose: 4000,
+        style: {
+          background: "#fee2e2",
+          color: "#991b1b",
+          border: "1px solid #fecaca",
+        },
+      });
+      return false;
+
+    } catch (error) {
+      console.error("API Error:", error);
+      
+      let errorMessage = "Something went wrong";
+      const errorData = error.response?.data;
+
+      // Handle different error response formats
+      if (errorData?.success === false && errorData?.errors) {
+        if (typeof errorData.errors === "string") {
+          errorMessage = errorData.errors;
+        } else if (typeof errorData.errors === "object") {
+          errorMessage = Object.values(errorData.errors)
+            .flat()
+            .join(", ");
+        }
+      } else if (errorData?.errors) {
         if (typeof errorData.errors === "string") {
           errorMessage = errorData.errors;
         } else if (Array.isArray(errorData.errors)) {
@@ -126,19 +211,42 @@ export default function StepBasic({ setStep, setProductId, setError }) {
             .map((err) => err.message || err)
             .join(", ");
         } else if (typeof errorData.errors === "object") {
-          errorMessage = Object.entries(errorData.errors)
-            .map(([key, value]) => `${key}: ${value}`)
+          errorMessage = Object.values(errorData.errors)
+            .flat()
             .join(", ");
         }
       } else if (errorData?.message) {
         errorMessage = errorData.message;
+      } else if (error.message) {
+        errorMessage = error.message;
       }
 
+      toast.error(`❌ ${errorMessage}`, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        style: {
+          background: "#fee2e2",
+          color: "#991b1b",
+          border: "1px solid #fecaca",
+        },
+      });
       setError(errorMessage);
+      return false;
     } finally {
       setLoading(false);
     }
   };
+
+  /* ================= EXPOSE SAVE STEP ================= */
+  useImperativeHandle(ref, () => ({
+    async saveStep() {
+      return await handleSubmit();
+    },
+  }));
 
   if (pageLoading) return <div className="py-12 text-center">Loading...</div>;
   return (
@@ -262,7 +370,9 @@ export default function StepBasic({ setStep, setProductId, setError }) {
       </div>
     </div>
   );
-}
+});
+
+export default StepBasic;
 
 /* ================= SEARCHABLE SELECT ================= */
 

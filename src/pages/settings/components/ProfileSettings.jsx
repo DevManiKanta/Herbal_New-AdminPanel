@@ -368,17 +368,16 @@ export default function ProfileSettings() {
 
         {/* PROFILE IMAGE */}
         <div className="flex items-center gap-6">
-          <div className="w-24 h-24 rounded-full border bg-gray-50 overflow-hidden flex items-center justify-center">
+          {/* <div className="w-24 h-24 rounded-full border bg-gray-50 overflow-hidden flex items-center justify-center">
             <img
               src={avatar}
               alt="Avatar"
               className="w-full h-full object-cover"
             />
-          </div>
-
+          </div> */}
           {editMode && (
             <div className="flex gap-3">
-              <label className="px-4 py-1.5 text-sm border rounded-lg cursor-pointer hover:bg-gray-50">
+              {/* <label className="px-4 py-1.5 text-sm border rounded-lg cursor-pointer hover:bg-gray-50">
                 Upload
                 <input
                   type="file"
@@ -386,7 +385,7 @@ export default function ProfileSettings() {
                   hidden
                   onChange={handleAvatarChange}
                 />
-              </label>
+              </label> */}
 
               {/* <button
                 onClick={handleRemoveAvatar}
@@ -397,9 +396,6 @@ export default function ProfileSettings() {
             </div>
           )}
         </div>
-
-        <hr />
-
         {/* PROFILE INFO */}
         <div className="space-y-5 text-sm">
           {["name", "email", "phone"].map((field) => (

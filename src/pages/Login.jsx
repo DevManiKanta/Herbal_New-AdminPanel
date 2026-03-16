@@ -186,6 +186,8 @@ export default function Login() {
     settings?.logo && settings.logo.trim() !== ""
       ? settings.logo
       : FALLBACK_LOGO;
+   
+//  console.log("TEST",logo)
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -225,13 +227,13 @@ export default function Login() {
 
       <div className="relative w-full max-w-md bg-white rounded-xl shadow-2xl p-8 mr-0 md:mr-10">
         {/* Logo */}
-        <div className="flex justify-center mb-6">
+        {/* <div className="flex justify-center mb-6">
           <img
             src={logo}
             alt="App Logo"
             className="h-20 md:h-24 object-contain"
           />
-        </div>
+        </div> */}
 
         <h2 className="text-xl font-semibold text-center mb-6">Login</h2>
 

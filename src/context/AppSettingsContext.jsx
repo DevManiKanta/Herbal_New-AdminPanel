@@ -71,41 +71,58 @@ export const AppSettingsProvider = ({ children }) => {
 
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadSettings = async () => {
+  const loadSettings = async () => {
+    try {
+      setLoading(true);
+      
+      // Try admin endpoint first (more up-to-date)
       try {
-        const res = await api.get("/auth/app-logo-settings");
-
-        if (!isMounted) return;
-
-        if (res.data?.success && res.data?.data) {
+        const res = await api.get("/admin-dashboard/app-logo-settings");
+        if (res.data?.data) {
           const data = res.data.data;
-
           setSettings({
             logo: data.app_logo ? `${BASE_URL}/${data.app_logo}` : "",
             app_name: data.app_name || "",
             favicon: data.app_favicon ? `${BASE_URL}/${data.app_favicon}` : "",
           });
+          return;
         }
       } catch (err) {
-        console.error("Failed to load app settings", err);
-      } finally {
-        if (isMounted) setLoading(false);
+        // Fallback to auth endpoint
+        console.log("Admin endpoint failed, trying auth endpoint");
       }
-    };
 
+      // Fallback to auth endpoint
+      const res = await api.get("/auth/app-logo-settings");
+      if (res.data?.success && res.data?.data) {
+        const data = res.data.data;
+        setSettings({
+          logo: data.app_logo ? `${BASE_URL}/${data.app_logo}` : "",
+          app_name: data.app_name || "",
+          favicon: data.app_favicon ? `${BASE_URL}/${data.app_favicon}` : "",
+        });
+      }
+    } catch (err) {
+      console.error("Failed to load app settings", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     loadSettings();
 
-    return () => {
-      isMounted = false;
-    };
+    // Refresh settings every 5 seconds to catch updates
+    const interval = setInterval(() => {
+      loadSettings();
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
   // 🔥 IMPORTANT: Memoize value
   const value = useMemo(() => {
-    return { settings, loading };
+    return { settings, loading, refreshSettings: loadSettings };
   }, [settings, loading]);
 
   return (

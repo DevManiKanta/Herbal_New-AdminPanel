@@ -120,13 +120,28 @@ const StepGallery = forwardRef(({ productId }, ref) => {
             formData.append("video_urls[]", url);
           });
 
-        await api.post(
+        const response = await api.post(
           `/admin-dashboard/product/${productId}/gallery`,
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },
           },
         );
+
+        if (response.data?.success === false) {
+          let errorMessage = "Failed to save gallery";
+          if (response.data?.errors) {
+            if (typeof response.data.errors === "string") {
+              errorMessage = response.data.errors;
+            } else if (typeof response.data.errors === "object") {
+              errorMessage = Object.values(response.data.errors)
+                .flat()
+                .join(", ");
+            }
+          }
+          alert(errorMessage);
+          return false;
+        }
 
         return true;
       } catch (error) {
@@ -135,16 +150,21 @@ const StepGallery = forwardRef(({ productId }, ref) => {
         let message = "Failed to save product gallery";
 
         if (error.response) {
-          // Backend responded with error
-          message =
-            error.response.data?.errors ||
-            error.response.data?.message ||
-            "Server error";
+          const errorData = error.response.data;
+          if (errorData?.errors) {
+            if (typeof errorData.errors === "string") {
+              message = errorData.errors;
+            } else if (typeof errorData.errors === "object") {
+              message = Object.values(errorData.errors)
+                .flat()
+                .join(", ");
+            }
+          } else if (errorData?.message) {
+            message = errorData.message;
+          }
         } else if (error.request) {
-          // Request made but no response
           message = "No response from server";
         } else {
-          // Something else happened
           message = error.message;
         }
 
