@@ -116,6 +116,7 @@ function AppRoutes() {
               <>
                 <Route path="/orders" element={<POSOrders />} />
                 <Route path="/orders/:id" element={<OrderDetail />} />
+                <Route path="/pos/orders/:id" element={<POSOrderView />} />
                 <Route path="*" element={<Navigate to="/orders" />} />
               </>
             )}

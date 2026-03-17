@@ -25,7 +25,13 @@ export default function OrderDetail() {
     loadOrder();
   }, [id]);
 
-  if (loading) return <p>Loading order...</p>;
+  if (loading)
+    return (
+      <div className="flex items-center justify-center py-24">
+        <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+
   if (!order) return <p>Order not found</p>;
 
   return (

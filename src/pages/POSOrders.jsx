@@ -127,99 +127,137 @@ export default function POSOrders() {
       <input
         placeholder="Search by order / name / phone"
         value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        onChange={(e) => { setSearch(e.target.value); setPage(1); }}
         className="border px-3 py-2 rounded w-64"
       />
 
       {loading ? (
-        <p>Loading...</p>
+        <div className="flex items-center justify-center py-24">
+          <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+        </div>
       ) : (
         <div className="bg-white rounded-xl shadow overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead className="bg-gray-100">
               <tr>
-                <th className="p-3">#</th>
-                <th className="p-3">Order</th>
-                <th className="p-3">Customer</th>
-                <th className="p-3">Phone</th>
+                <th className="p-3 text-left">#</th>
+                <th className="p-3 text-left">Order</th>
+                <th className="p-3 text-left">Customer</th>
+                <th className="p-3 text-left">Phone</th>
                 <th className="p-3 text-right">Total</th>
-                <th className="p-3">ShipRocket Created Status</th>
-                <th className="p-3">Actions</th>
+                <th className="p-3 text-left">ShipRocket Created Status</th>
+                <th className="p-3 text-left">Actions</th>
               </tr>
             </thead>
 
             <tbody>
-              {paginated.map((o, i) => (
-                <tr key={o.id} className="border-t">
-                  <td className="p-3">{(page - 1) * perPage + i + 1}</td>
-                  <td className="p-3 font-medium">ORD-{o.id}</td>
-                  <td className="p-3">{o.user?.name}</td>
-                  <td className="p-3">{o.user?.phone}</td>
-                  <td className="p-3 text-right font-semibold">
-                    ₹ {o.total_amount}
-                  </td>
-
-                  <td className="p-3 space-y-1">
-                    {shipmentBadge(o.shipment_status)}
-                    {shipmentBadge(o.shiprocket_order_id)}
-                    {o.awb_code && (
-                      <div className="text-xs">AWB: {o.awb_code}</div>
-                    )}
-                  </td>
-
-                  <td className="p-3 space-y-2">
-                    {!o.shiprocket_order_id && (
-                      <>
-                        {/* <button
-                          onClick={() => {
-                            setSelectedOrderId(o.id);
-                            setLocalOpen(true);
-                          }}
-                          className="block w-full bg-orange-600 text-white text-xs px-2 py-1 rounded"
-                        >
-                          Local Courier
-                        </button> */}
-                      </>
-                    )}
-
-                    <button
-                      onClick={() => navigate(`/pos/orders/${o.id}`)}
-                      className="block text-xs text-indigo-600"
-                    >
-                      View
-                    </button>
+              {paginated.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="p-6 text-center text-gray-400">
+                    No orders found
                   </td>
                 </tr>
-              ))}
+              ) : (
+                paginated.map((o, i) => (
+                  <tr key={o.id} className="border-t hover:bg-gray-50 transition-colors">
+                    <td className="p-3 text-gray-500">{(page - 1) * perPage + i + 1}</td>
+                    <td className="p-3 font-medium">ORD-{o.id}</td>
+                    <td className="p-3">{o.user?.name}</td>
+                    <td className="p-3">{o.user?.phone}</td>
+                    <td className="p-3 text-right font-semibold">₹ {o.total_amount}</td>
+                    <td className="p-3 space-y-1">
+                      {shipmentBadge(o.shipment_status)}
+                      {shipmentBadge(o.shiprocket_order_id)}
+                      {o.awb_code && <div className="text-xs">AWB: {o.awb_code}</div>}
+                    </td>
+                    <td className="p-3">
+                      <button
+                        onClick={() => navigate(`/pos/orders/${o.id}`)}
+                        className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+                      >
+                        View
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       )}
 
       {/* PAGINATION */}
-      <div className="flex justify-between">
-        <select
-          value={perPage}
-          onChange={(e) => setPerPage(+e.target.value)}
-          className="border px-2 py-1"
-        >
-          {[5, 10, 20].map((n) => (
-            <option key={n}>{n}</option>
-          ))}
-        </select>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-sm text-gray-500">
+          <span>Rows per page:</span>
+          <select
+            value={perPage}
+            onChange={(e) => { setPerPage(+e.target.value); setPage(1); }}
+            className="border rounded px-2 py-1 text-sm"
+          >
+            {[5, 10, 20, 50].map((n) => (
+              <option key={n}>{n}</option>
+            ))}
+          </select>
+          <span>
+            {filtered.length === 0 ? 0 : (page - 1) * perPage + 1}–{Math.min(page * perPage, filtered.length)} of {filtered.length}
+          </span>
+        </div>
 
-        <div className="space-x-2">
-          <button disabled={page === 1} onClick={() => setPage(page - 1)}>
+        <div className="flex items-center gap-1">
+          <button
+            disabled={page === 1}
+            onClick={() => setPage(1)}
+            className="px-2 py-1 rounded text-sm border disabled:opacity-40 hover:bg-gray-100"
+          >
+            «
+          </button>
+          <button
+            disabled={page === 1}
+            onClick={() => setPage(page - 1)}
+            className="px-3 py-1 rounded text-sm border disabled:opacity-40 hover:bg-gray-100"
+          >
             Prev
           </button>
-          <span>
-            {page}/{totalPages || 1}
-          </span>
+
+          {Array.from({ length: totalPages || 1 }, (_, i) => i + 1)
+            .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
+            .reduce((acc, p, idx, arr) => {
+              if (idx > 0 && p - arr[idx - 1] > 1) acc.push("...");
+              acc.push(p);
+              return acc;
+            }, [])
+            .map((p, idx) =>
+              p === "..." ? (
+                <span key={`ellipsis-${idx}`} className="px-2 py-1 text-sm text-gray-400">…</span>
+              ) : (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={`px-3 py-1 rounded text-sm border transition-colors ${
+                    page === p
+                      ? "bg-indigo-600 text-white border-indigo-600"
+                      : "hover:bg-gray-100"
+                  }`}
+                >
+                  {p}
+                </button>
+              )
+            )}
+
           <button
-            disabled={page === totalPages}
+            disabled={page === totalPages || totalPages === 0}
             onClick={() => setPage(page + 1)}
+            className="px-3 py-1 rounded text-sm border disabled:opacity-40 hover:bg-gray-100"
           >
             Next
+          </button>
+          <button
+            disabled={page === totalPages || totalPages === 0}
+            onClick={() => setPage(totalPages)}
+            className="px-2 py-1 rounded text-sm border disabled:opacity-40 hover:bg-gray-100"
+          >
+            »
           </button>
         </div>
       </div>

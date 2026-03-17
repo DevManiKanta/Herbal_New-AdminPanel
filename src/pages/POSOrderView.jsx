@@ -46,7 +46,13 @@ export default function POSOrderView() {
     );
   }, [order]);
 
-  if (loading) return <div className="p-6">Loading order...</div>;
+  if (loading)
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+
   if (!order) return <div className="p-6">Order not found</div>;
 
   return (
