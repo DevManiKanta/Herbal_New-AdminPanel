@@ -23,6 +23,11 @@ export default function AddProductDrawer({ open, onClose }) {
   const taxRef = useRef(null);
 
   useEffect(() => {
+    if (open) {
+      setStep(1);
+      setProductId(null);
+      setError(null);
+    }
     document.body.style.overflow = open ? "hidden" : "auto";
     return () => (document.body.style.overflow = "auto");
   }, [open]);
